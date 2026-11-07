@@ -597,6 +597,17 @@
             text-align: center; line-height: 1.8; padding: 0 24px;
         }
         #ar-fallback.hidden { display: none; }
+        #ar-video.off { display: none; }
+        #btn-ar-toggle {
+            position: absolute; right: 14px; z-index: 4;
+            top: calc(150px + env(safe-area-inset-top, 0px));
+            padding: 6px 14px; border-radius: 16px; cursor: pointer;
+            background: rgba(8, 10, 18, 0.82); color: #9ab8d8;
+            border: 1px solid rgba(100, 180, 255, 0.3);
+            font-size: 12px; font-weight: 700; letter-spacing: 1px;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        #btn-ar-toggle.on { color: #0a0e14; background: linear-gradient(135deg, #7ec8ff, #4a9eff); border-color: transparent; }
         #battle-canvas {
             position: absolute; inset: 0; width: 100%; height: 100%;
             z-index: 1; touch-action: none; display: block;
@@ -815,9 +826,10 @@
     <div id="battle-overlay" class="battle-overlay hidden">
         <video id="ar-video" autoplay playsinline muted></video>
         <div id="ar-fallback">
-            <div class="fallback-label">摄像头不可用<br>已切换至灵界视界</div>
+            <div class="fallback-label" id="fallback-label">灵界视界</div>
         </div>
         <canvas id="battle-canvas"></canvas>
+        <button id="btn-ar-toggle" type="button">AR 关</button>
         <div id="hit-flash"></div>
 
         <div class="battle-top">
@@ -1106,6 +1118,8 @@
             };
 
             let cameraStream = null;
+            let arMode = false;   // 默认非 AR 模式
+            try { arMode = localStorage.getItem('yujian_ar_mode') === '1'; } catch (e) {}
             let currentGymId = null;
             let kilnTimer = null;
 
@@ -1127,6 +1141,36 @@
             // ============================================================
             // 摄像头
             // ============================================================
+            const btnArToggle = document.getElementById('btn-ar-toggle');
+            const fallbackLabel = document.getElementById('fallback-label');
+            function stopCamera() {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(t => t.stop());
+                    cameraStream = null;
+                }
+                arVideo.srcObject = null;
+            }
+            async function applyBattleMode() {
+                btnArToggle.textContent = arMode ? 'AR 开' : 'AR 关';
+                btnArToggle.classList.toggle('on', arMode);
+                if (!arMode) {
+                    stopCamera();
+                    arVideo.classList.add('off');
+                    fallbackLabel.textContent = '灵界视界';
+                    arFallback.classList.remove('hidden');
+                    return;
+                }
+                arVideo.classList.remove('off');
+                const ok = await ensureCamera();
+                if (!ok) fallbackLabel.innerHTML = '摄像头不可用<br>已切换至灵界视界';
+            }
+            btnArToggle.addEventListener('click', () => {
+                arMode = !arMode;
+                try { localStorage.setItem('yujian_ar_mode', arMode ? '1' : '0'); } catch (e) {}
+                applyBattleMode();
+            });
+            btnArToggle.addEventListener('pointerdown', (e) => e.stopPropagation());
+
             async function ensureCamera() {
                 if (cameraStream) {
                     arVideo.srcObject = cameraStream;
@@ -1253,20 +1297,47 @@
             // ============================================================
             function pickRandomTargetLatLng() {
                 if (!state.map || !state.playerLatLng) return null;
-                const bounds = state.map.getBounds();
-                const sw = bounds.getSouthWest(), ne = bounds.getNorthEast();
-                const latSpan = ne.lat - sw.lat, lngSpan = ne.lng - sw.lng;
-                const pad = CONFIG.spawnEdgePad;
-                const minLat = sw.lat + latSpan * pad, maxLat = ne.lat - latSpan * pad;
-                const minLng = sw.lng + lngSpan * pad, maxLng = ne.lng - lngSpan * pad;
-                if (maxLat <= minLat || maxLng <= minLng) return null;
+                const size = state.map.getSize();
+                if (size.x < 50 || size.y < 50) return null;   // 地图尺寸未就绪，交给兜底逻辑
 
-                for (let attempt = 0; attempt < 30; attempt++) {
-                    const lat = minLat + Math.random() * (maxLat - minLat);
-                    const lng = minLng + Math.random() * (maxLng - minLng);
+                const center = state.map.getCenter();
+                const bounds = state.map.getBounds();
+                const halfW = center.distanceTo(L.latLng(center.lat, bounds.getEast()));
+                const halfH = center.distanceTo(L.latLng(bounds.getNorth(), center.lng));
+                const maxR = Math.max(CONFIG.minPlayerDist + 30, Math.min(halfW, halfH) * 0.92);
+                const minR = Math.min(maxR - 20, Math.max(CONFIG.minPlayerDist, maxR * 0.3));
+
+                // 把圆分成 8 个扇区，优先选妖邪最少的扇区，避免扎堆
+                const SECT = 8;
+                const counts = new Array(SECT).fill(0);
+                const lat0 = state.playerLatLng.lat, lng0 = state.playerLatLng.lng;
+                for (const t of state.targets) {
+                    let ang = Math.atan2(t.latlng.lng - lng0, t.latlng.lat - lat0);
+                    if (ang < 0) ang += Math.PI * 2;
+                    counts[Math.min(SECT - 1, Math.floor(ang / (Math.PI * 2) * SECT))]++;
+                }
+                const minCount = Math.min.apply(null, counts);
+                const sectors = [];
+                counts.forEach((c, i) => { if (c === minCount) sectors.push(i); });
+
+                const latPerMeter = 1 / 111320;
+                const lngPerMeter = 1 / (111320 * Math.cos(lat0 * Math.PI / 180));
+
+                for (let attempt = 0; attempt < 40; attempt++) {
+                    // 前 25 次限制在最空的扇区，之后放宽到任意方向
+                    const sec = attempt < 25 ? sectors[Math.floor(Math.random() * sectors.length)]
+                                              : Math.floor(Math.random() * SECT);
+                    const angle = (sec + Math.random()) / SECT * Math.PI * 2;
+                    const dist = minR + Math.sqrt(Math.random()) * (maxR - minR);
+                    const lat = lat0 + Math.cos(angle) * dist * latPerMeter;
+                    const lng = lng0 + Math.sin(angle) * dist * lngPerMeter;
                     const candidate = L.latLng(lat, lng);
-                    const d = candidate.distanceTo(state.playerLatLng);
-                    if (d < CONFIG.minPlayerDist || d > CONFIG.maxSpawnDist) continue;
+
+                    // 不能压在 HUD / 雷达 / 按钮上
+                    const pt = state.map.latLngToContainerPoint(candidate);
+                    if (pt.x < 40 || pt.x > size.x - 70) continue;
+                    if (pt.y < 100 || pt.y > size.y - 130) continue;
+                    if (pt.x < 250 && pt.y > size.y - 260) continue;   // 雷达面板区域
 
                     let tooClose = false;
                     for (const t of state.targets) {
@@ -2007,7 +2078,7 @@
                 if (battle.damageBonus > 1) addBattleLog('⚔ 飞剑符加持，伤害提升');
 
                 battleOverlay.classList.remove('hidden');
-                ensureCamera();
+                applyBattleMode();
 
                 requestAnimationFrame(() => {
                     layoutBattle();
@@ -2500,7 +2571,7 @@
                     ? '默认位置（北京）· 点击妖邪或道场开始'
                     : '点击妖邪或道场开始';
 
-                ensureCamera();
+                applyBattleMode();
 
                 // 生成道场
                 spawnGyms();
