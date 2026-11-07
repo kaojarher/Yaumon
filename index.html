@@ -254,6 +254,10 @@
         .target-marker.elite .target-ring { border-color: rgba(255, 210, 100, 0.6); }
         .target-marker.elite .target-distance { top: 54px; }
         .collection-card { cursor: pointer; }
+        .fuse-card { cursor: pointer; }
+        .fuse-slots { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 6px 0 10px; }
+        .fuse-slot { width: 74px; height: 74px; border: 1px dashed rgba(255,209,102,0.45); border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(255,209,102,0.05); }
+        .fuse-op { color: #ffd166; font-size: 20px; font-weight: 800; }
         .collection-card.equipped { border-color: #ffd166; box-shadow: 0 0 14px rgba(255, 209, 102, 0.4); }
         .dex-card { background: rgba(100,180,255,0.05); border: 1px solid rgba(100,180,255,0.12); border-radius: 12px; padding: 8px 4px; text-align: center; }
         .dex-card.unknown { opacity: 0.45; }
@@ -961,6 +965,7 @@
                 <button class="modal-tab active" data-tab="items">物品</button>
                 <button class="modal-tab" data-tab="kiln">練妖壺</button>
                 <button class="modal-tab" data-tab="collection">圖鑑</button>
+                <button class="modal-tab" data-tab="fuse">合成</button>
                 <button class="modal-tab" data-tab="quests">任務</button>
                 <button class="modal-tab" data-tab="upgrade">修煉</button>
                 <button class="modal-tab" data-tab="settings">設定</button>
@@ -969,6 +974,7 @@
                 <div class="tab-panel" id="tab-items"></div>
                 <div class="tab-panel hidden" id="tab-kiln"></div>
                 <div class="tab-panel hidden" id="tab-collection"></div>
+                <div class="tab-panel hidden" id="tab-fuse"></div>
                 <div class="tab-panel hidden" id="tab-quests"></div>
                 <div class="tab-panel hidden" id="tab-upgrade"></div>
                 <div class="tab-panel hidden" id="tab-settings"></div>
@@ -1062,6 +1068,12 @@
             const I18N = {"en":{"赤炎妖":"Ember Ogre","幽冥鬼":"Netherwraith","噬魂鼠":"Soul Rat","獠牙精":"Tusk Brute","蛟龍子":"Dragonling","魅影狐":"Phantom Fox","枯骨怪":"Bone Fiend","夜叉王":"Yaksha King","青龍壇":"Azure Dragon Altar","白虎壇":"White Tiger Altar","朱雀壇":"Vermilion Bird Altar","玄武壇":"Black Tortoise Altar","天劍道場":"Heavenly Sword Dojo","雲隱道場":"Hidden Cloud Dojo","飛劍符":"Sword Talisman","下次戰鬥自動消耗，傷害提升 60%":"Used automatically in your next battle; +60% damage","回氣丹":"Qi Pill","立即恢復 1 點劍氣":"Instantly restores 1 Sword Qi","妖丹":"Demon Core","練妖壺孵化材料，集齊 3 顆可孵化妖怪":"Cauldron material. Collect 3 to hatch a monster","引妖香":"Lure Incense","立即引來 4 只妖邪（戰鬥中不可用）":"Instantly draws in 4 fiends (not usable in battle)","AR 開":"AR On","AR 關":"AR Off","靈界視界":"Spirit Realm View","鏡頭不可用":"Camera unavailable","已切換至靈界視界":"Switched to Spirit Realm view","鏡頭不可用:":"Camera unavailable:","已切換至預設位置（北京）。":"Switched to the default location (Beijing).","您的瀏覽器不支援地理定位，":"Your browser does not support geolocation.","步行達":"Walked","km，靈石 +5":"km · Spirit Stones +5","定位失敗：":"Location failed:","請允許定位許可權。":"please allow location permission.","位置資訊不可用。":"position unavailable.","定位超時。":"request timed out.","定位失敗：請允許定位許可權。":"Location failed: please allow location permission.","定位失敗：位置資訊不可用。":"Location failed: position unavailable.","定位失敗：定位超時。":"Location failed: request timed out.","王":"K","精":"E","道":"D","泉":"S","一隻妖邪遁走了，新的妖邪出現…":"A fiend fled; a new one appears…","已佔領 · 我方":"Captured · Yours","再次挑戰":"Challenge again","中立道場":"Neutral Dojo","挑戰道場":"Challenge Dojo","調息中 {0}s":"Recovering {0}s","守衛產出：💎 {0} / 30（每分鐘 +1）":"Guard output: 💎 {0} / 30 (+1 per minute)","佔領後可持續產出靈石":"Capture it to earn Spirit Stones over time","道場調息中，請稍後再來":"The dojo is recovering. Come back later","道場":"Dojo","守軍":"Guardian","挑戰獎勵：":"Challenge reward:","妖丹 ×2":"Demon Core ×2","道場守軍實力強於普通妖邪":"Dojo guardians are stronger than ordinary fiends","收取靈石":"Collect Spirit Stones","收取守衛產出：靈石 +{0}":"Collected guard output: Spirit Stones +{0}","（道場守軍）":"(Dojo guardian)","{0}（道場守軍）":"{0} (Dojo guardian)","道場攻佔成功！獲得妖丹×2 飛劍符×1":"Dojo captured! Got Demon Core ×2, Sword Talisman ×1","攻佔 {0}！妖丹×2 飛劍符×1":"Captured {0}! Demon Core ×2, Sword Talisman ×1","使用":"Use","自動":"Auto","點燃":"Light","孵化":"Hatching","引妖香點燃，妖邪被吸引而來！":"The incense burns, and fiends are drawn in!","劍氣已滿":"Sword Qi is full","使用回氣丹，劍氣 +1":"Used a Qi Pill: Sword Qi +1","孵化完成！":"Hatching complete!","{1} 已成形":"{1} has taken shape","領取妖怪":"Claim monster","孵化中… 剩餘 {0} 秒":"Hatching… {0}s left","正在妖氣中成形…":"Forming in demonic energy…","練妖壺":"Cauldron","放入 {0} 顆妖丹，":"Put in {0} Demon Cores","可孵化出一隻稀有妖怪。":"to hatch a rare monster.","當前妖丹：{1} 顆":"Demon Cores: {1}","啟動孵化":"Start hatching","練妖壺啟動，30 秒後孵化":"Cauldron started — hatches in 30s","孵化成功：{0}":"Hatched: {0}","妖怪圖鑑 {0}/{1} · 步行 {2} km":"Monster Codex {0}/{1} · Walked {2} km","尚未收服任何妖怪":"No monsters tamed yet","擊敗妖邪有機會收服，也可用練妖壺孵化":"Defeat fiends for a chance to tame them, or hatch them in the cauldron","點選已收服的妖怪可令其出戰":"Tap a tamed monster to send it into battle","✦出戰":"✦ Active","我的妖怪":"My Monsters","收服 {0}！":"Tamed {0}!","{0} Lv.{1} ✦出戰":"{0} Lv.{1} ✦ Active","{0} Lv.{1}":"{0} Lv.{1}","{0} ×{1}":"{0} ×{1}","附近暫無妖邪":"No fiends nearby","👑 妖王":"👑 Fiend King","⭐ 精英妖邪":"⭐ Elite Fiend","妖邪":"Fiend","附近妖邪":"Nearby Fiends","正在獲取位置…":"Getting location…","擊敗 1 只精英妖邪":"Defeat 1 elite fiend","攻佔 / 挑戰道場 1 次":"Capture / challenge a dojo once","用練妖壺孵化 1 只妖怪":"Hatch 1 monster in the cauldron","使用 2 次靈泉補給":"Use the Spirit Spring 2 times","斬殺 10 只妖邪":"Slay 10 fiends","斬殺 5 只妖邪":"Slay 5 fiends","任務完成：":"Quest complete:","任務完成：{0}":"Quest complete: {0}","每日任務 · 次日自動重新整理":"Daily quests · refresh tomorrow","已領取":"Claimed","領取":"Claim","進度 {2} / {3} · 獎勵 {4}":"Progress {2} / {3} · Reward {4}","領取獎勵：靈石 +{0}":"Reward claimed: Spirit Stones +{0}","劍氣上限":"Max Sword Qi","最大劍氣 +1":"Max Sword Qi +1","劍意":"Sword Intent","飛劍傷害 +8%":"Flying sword damage +8%","調息":"Meditation","地圖上劍氣恢復更快":"Sword Qi regenerates faster on the map","靈石：💎 {0}":"Spirit Stones: 💎 {0}","已滿":"Maxed","擊敗妖邪、完成任務、攻佔道場可獲得靈石":"Earn Spirit Stones by defeating fiends, completing quests and capturing dojos","靈石不足":"Not enough Spirit Stones","{0} 提升至 Lv.{1}":"{0} raised to Lv.{1}","妖寵已收回":"Companion recalled","{0} 出戰！傷害 +{1}%":"{0} joins the fight! Damage +{1}%","{0} 升到 Lv.{1}！":"{0} reached Lv.{1}!","靈市":"Spirit Market","購買 {0}":"Bought {0}","靈泉恢復中":"Spirit Spring is recovering","靈泉恢復中 {0} 秒":"Spirit Spring recovering: {0}s","秒":"s","距離靈泉 {0}m，靠近到 80m 內再來":"The Spirit Spring is {0}m away. Get within 80m","靈石×":"Spirit Stones×","靈泉補給：":"Spring supplies:","靈泉補給：{0}":"Spring supplies: {0}","晴":"Clear","陰":"Cloudy","霧":"Fog","雨":"Rain","雪":"Snow","雷雨":"Storm","☀️晴":"☀️ Clear","☁️陰":"☁️ Cloudy","🌫️霧":"🌫️ Fog","🌧️雨":"🌧️ Rain","❄️雪":"❄️ Snow","⛈️雷雨":"⛈️ Storm","夜間精英更多":"More elites at night","靈石加成":"Spirit Stone bonus","精英更多":"More elites","🌙 夜":"🌙 Night","☀️ 晝":"☀️ Day","夜晚：精英妖邪更常出現":"Night: elite fiends appear more often","白天":"Daytime","天氣未獲取":"weather unavailable","音效":"Sound","戰鬥與拾取提示音":"Battle and pickup sounds","開":"On","關":"Off","AR 戰鬥背景":"AR battle background","開啟後戰鬥使用鏡頭畫面（進入戰鬥時才會請求許可權）":"When on, battles use the camera feed (permission is requested when a battle starts)","當前環境":"Current conditions","素材致謝":"Art Credits","角色與妖怪來自 LPC（Liberated Pixel Cup）素材":"Characters and monsters use LPC (Liberated Pixel Cup) assets","收起":"Hide","檢視":"View","清除存檔":"Erase save data","清空全部進度並重新開始":"Erase all progress and start over","清除":"Erase","角色與妖怪影象使用":"Character and monster images use","素材，經":"assets, assembled with","的圖層合成，並對部分圖層重新著色（顏色已修改）。合成後的精靈圖以相同授權條款（CC-BY-SA 3.0 / GPL 3.0）分享。":". Some layers were recolored (colors modified). The resulting sprites are shared under the same license terms (CC-BY-SA 3.0 / GPL 3.0).","授權":"Licenses","作者（{1} 位）":"Authors ({1})","來源頁面":"Source pages","確定清除全部進度嗎？此操作無法恢復。":"Erase all progress? This cannot be undone.","語言":"Language","選擇遊戲介面語言":"Choose the interface language","升級！Lv.{0} · 傷害提升":"Level up! Lv.{0} · Damage up","妖王·{0}":"King {0}","精英·{0}":"Elite {0}","妖王·":"King ","精英·":"Elite ","遭遇 {0}！":"Encountered {0}!","⚔ 飛劍符加持，傷害提升":"⚔ Sword Talisman active: damage up","向上滑動手指，甩出飛劍！":"Swipe up to throw your flying sword!","⚠ 妖邪蓄力中！命中可打斷":"⚠ The fiend is charging! Hit it to interrupt","{0} 正在蓄力…":"{0} is charging…","{0} 反擊！劍氣 -1":"{0} strikes back! Sword Qi -1","飛劍命中！造成 {0} 點傷害":"The sword hits! {0} damage","✦ 成功打斷妖邪蓄力！":"✦ Charge interrupted!","{0} 被斬殺！":"{0} was slain!","斬妖成功！":"Fiend slain!","劍氣耗盡，力竭撤退…":"Sword Qi depleted — retreating exhausted…","力竭撤退，運功調息後可再戰":"Retreated exhausted. Meditate, then fight again","力竭撤退，劍氣恢復至 {0}":"Retreated exhausted. Sword Qi restored to {0}","（精英）":"(Elite)","靈石 +{0}（精英）":"Spirit Stones +{0} (Elite)","靈石 +{0}":"Spirit Stones +{0}","妖王掉落：妖丹×2 引妖香×1":"Fiend King drops: Demon Core ×2, Lure Incense ×1","⚠ 妖王現身！":"⚠ A Fiend King appears!","妖丹 ×1":"Demon Core ×1","回氣丹 ×1":"Qi Pill ×1","飛劍符 ×1":"Sword Talisman ×1","獲得":"Got","獲得 {0}":"Got {0}","一劍斬妖！":"One strike, one fiend slain!","預設位置（北京）· 點選妖邪或道場開始":"Default location (Beijing) · Tap a fiend or dojo to begin","點選妖邪或道場開始":"Tap a fiend or dojo to begin","調息運功，劍氣 +1":"Meditating: Sword Qi +1","已讀取存檔 · Lv.{0}":"Save loaded · Lv.{0}","步行達 {0} km，靈石 +5":"Walked {0} km · Spirit Stones +5","{0} 已切換至預設位置（北京）。":"{0} Switched to the default location (Beijing).","重新定位…":"Relocating…","開始御劍":"Start Flying","定位成功 — 點選開始":"Location found — tap to start","遊戲暫停中… 回到頁面繼續":"Game paused… return to the page to continue","飛劍 · 御劍尋蹤":"Flying Sword · Sword Quest","御劍者":"Sword Rider","斬妖":"Kills","劍氣":"Qi","⚔ 劍氣":"⚔ Sword Qi","行囊":"Pack","物品":"Items","圖鑑":"Codex","任務":"Quests","修煉":"Training","設定":"Settings","正在初始化…":"Initializing…","劍意消散":"Sword Intent Faded","斬妖數":"Fiends Slain","重入江湖":"Return to the Jianghu","物品欄":"Pack","指南針":"Compass","回到當前位置":"Back to my location","放大":"Zoom in","縮小":"Zoom out"},"fr":{"赤炎妖":"Ogre ardent","幽冥鬼":"Spectre des limbes","噬魂鼠":"Rat dévoreur d'âmes","獠牙精":"Brute à défenses","蛟龍子":"Dragonnet","魅影狐":"Renard spectral","枯骨怪":"Squelette maudit","夜叉王":"Roi Yaksha","青龍壇":"Autel du Dragon azur","白虎壇":"Autel du Tigre blanc","朱雀壇":"Autel de l'Oiseau vermillon","玄武壇":"Autel de la Tortue noire","天劍道場":"Dojo de l'Épée céleste","雲隱道場":"Dojo du Nuage caché","飛劍符":"Talisman d'épée","下次戰鬥自動消耗，傷害提升 60%":"Utilisé automatiquement au prochain combat ; +60 % de dégâts","回氣丹":"Pilule de Qi","立即恢復 1 點劍氣":"Restaure instantanément 1 point de Qi d'épée","妖丹":"Noyau démoniaque","練妖壺孵化材料，集齊 3 顆可孵化妖怪":"Matériau du chaudron. Réunissez-en 3 pour faire éclore un monstre","引妖香":"Encens d'appât","立即引來 4 只妖邪（戰鬥中不可用）":"Attire instantanément 4 démons (inutilisable en combat)","AR 開":"RA activée","AR 關":"RA inactive","靈界視界":"Vision du monde spirituel","鏡頭不可用":"Caméra indisponible","已切換至靈界視界":"Vision du monde spirituel activée","鏡頭不可用:":"Caméra indisponible :","已切換至預設位置（北京）。":"Position par défaut (Pékin) utilisée.","您的瀏覽器不支援地理定位，":"Votre navigateur ne prend pas en charge la géolocalisation.","步行達":"Marche :","km，靈石 +5":"km · pierres spirituelles +5","定位失敗：":"Échec de la localisation :","請允許定位許可權。":"veuillez autoriser l'accès à la position.","位置資訊不可用。":"position indisponible.","定位超時。":"délai dépassé.","定位失敗：請允許定位許可權。":"Échec de la localisation : veuillez autoriser l'accès à la position.","定位失敗：位置資訊不可用。":"Échec de la localisation : position indisponible.","定位失敗：定位超時。":"Échec de la localisation : délai dépassé.","王":"R","精":"É","道":"D","泉":"S","一隻妖邪遁走了，新的妖邪出現…":"Un démon s'est enfui ; un nouveau apparaît…","已佔領 · 我方":"Conquis · À vous","再次挑戰":"Défier à nouveau","中立道場":"Dojo neutre","挑戰道場":"Défier le dojo","調息中 {0}s":"Récupération {0} s","守衛產出：💎 {0} / 30（每分鐘 +1）":"Production : 💎 {0} / 30 (+1 par minute)","佔領後可持續產出靈石":"Conquérez-le pour gagner des pierres spirituelles en continu","道場調息中，請稍後再來":"Le dojo récupère. Revenez plus tard","道場":"Dojo","守軍":"Gardien","挑戰獎勵：":"Récompense du défi :","妖丹 ×2":"Noyau démoniaque ×2","道場守軍實力強於普通妖邪":"Les gardiens de dojo sont plus forts que les démons ordinaires","收取靈石":"Récupérer les pierres","收取守衛產出：靈石 +{0}":"Production récupérée : pierres spirituelles +{0}","（道場守軍）":"(gardien du dojo)","{0}（道場守軍）":"{0} (gardien du dojo)","道場攻佔成功！獲得妖丹×2 飛劍符×1":"Dojo conquis ! Obtenu : noyau démoniaque ×2, talisman d'épée ×1","攻佔 {0}！妖丹×2 飛劍符×1":"{0} conquis ! Noyau démoniaque ×2, talisman d'épée ×1","使用":"Utiliser","自動":"Auto","點燃":"Allumer","孵化":"Éclosion","引妖香點燃，妖邪被吸引而來！":"L'encens brûle : des démons accourent !","劍氣已滿":"Qi d'épée au maximum","使用回氣丹，劍氣 +1":"Pilule de Qi utilisée : Qi d'épée +1","孵化完成！":"Éclosion terminée !","{1} 已成形":"{1} a pris forme","領取妖怪":"Récupérer le monstre","孵化中… 剩餘 {0} 秒":"Éclosion… {0} s restantes","正在妖氣中成形…":"Se forme dans l'énergie démoniaque…","練妖壺":"Creuset","放入 {0} 顆妖丹，":"Placez {0} noyaux démoniaques","可孵化出一隻稀有妖怪。":"pour faire éclore un monstre rare.","當前妖丹：{1} 顆":"Noyaux démoniaques : {1}","啟動孵化":"Lancer l'éclosion","練妖壺啟動，30 秒後孵化":"Chaudron lancé — éclosion dans 30 s","孵化成功：{0}":"Éclosion réussie : {0}","妖怪圖鑑 {0}/{1} · 步行 {2} km":"Codex des monstres {0}/{1} · Marche {2} km","尚未收服任何妖怪":"Aucun monstre apprivoisé pour l'instant","擊敗妖邪有機會收服，也可用練妖壺孵化":"Vaincre des démons permet de les apprivoiser ; vous pouvez aussi les faire éclore au chaudron","點選已收服的妖怪可令其出戰":"Touchez un monstre apprivoisé pour l'envoyer au combat","✦出戰":"✦ En combat","我的妖怪":"Mes monstres","收服 {0}！":"{0} apprivoisé !","{0} Lv.{1} ✦出戰":"{0} niv. {1} ✦ En combat","{0} Lv.{1}":"{0} niv. {1}","{0} ×{1}":"{0} ×{1}","附近暫無妖邪":"Aucun démon à proximité","👑 妖王":"👑 Roi démon","⭐ 精英妖邪":"⭐ Démon d'élite","妖邪":"Démon","附近妖邪":"Démons proches","正在獲取位置…":"Localisation en cours…","擊敗 1 只精英妖邪":"Vaincre 1 démon d'élite","攻佔 / 挑戰道場 1 次":"Conquérir / défier un dojo 1 fois","用練妖壺孵化 1 只妖怪":"Faire éclore 1 monstre au chaudron","使用 2 次靈泉補給":"Utiliser la source spirituelle 2 fois","斬殺 10 只妖邪":"Terrasser 10 démons","斬殺 5 只妖邪":"Terrasser 5 démons","任務完成：":"Quête accomplie :","任務完成：{0}":"Quête accomplie : {0}","每日任務 · 次日自動重新整理":"Quêtes quotidiennes · renouvelées demain","已領取":"Récupéré","領取":"Récupérer","進度 {2} / {3} · 獎勵 {4}":"Progression {2} / {3} · Récompense {4}","領取獎勵：靈石 +{0}":"Récompense récupérée : pierres spirituelles +{0}","劍氣上限":"Qi d'épée max.","最大劍氣 +1":"Qi d'épée max. +1","劍意":"Intention de l'épée","飛劍傷害 +8%":"Dégâts de l'épée volante +8 %","調息":"Méditation","地圖上劍氣恢復更快":"Le Qi d'épée se régénère plus vite sur la carte","靈石：💎 {0}":"Pierres spirituelles : 💎 {0}","已滿":"Max.","擊敗妖邪、完成任務、攻佔道場可獲得靈石":"Gagnez des pierres spirituelles en vainquant des démons, en accomplissant des quêtes et en conquérant des dojos","靈石不足":"Pierres spirituelles insuffisantes","{0} 提升至 Lv.{1}":"{0} passe au niv. {1}","妖寵已收回":"Compagnon rappelé","{0} 出戰！傷害 +{1}%":"{0} entre au combat ! Dégâts +{1} %","{0} 升到 Lv.{1}！":"{0} atteint le niv. {1} !","靈市":"Marché spirituel","購買 {0}":"{0} acheté","靈泉恢復中":"La source spirituelle récupère","靈泉恢復中 {0} 秒":"Source en récupération : {0} s","秒":" s","距離靈泉 {0}m，靠近到 80m 內再來":"La source est à {0} m. Approchez-vous à moins de 80 m","靈石×":"Pierres spirituelles×","靈泉補給：":"Provisions de la source :","靈泉補給：{0}":"Provisions de la source : {0}","晴":"Dégagé","陰":"Nuageux","霧":"Brouillard","雨":"Pluie","雪":"Neige","雷雨":"Orage","☀️晴":"☀️ Dégagé","☁️陰":"☁️ Nuageux","🌫️霧":"🌫️ Brouillard","🌧️雨":"🌧️ Pluie","❄️雪":"❄️ Neige","⛈️雷雨":"⛈️ Orage","夜間精英更多":"Plus d'élites la nuit","靈石加成":"Bonus de pierres","精英更多":"Plus d'élites","🌙 夜":"🌙 Nuit","☀️ 晝":"☀️ Jour","夜晚：精英妖邪更常出現":"Nuit : les démons d'élite apparaissent plus souvent","白天":"Jour","天氣未獲取":"météo indisponible","音效":"Sons","戰鬥與拾取提示音":"Sons de combat et de ramassage","開":"Oui","關":"Non","AR 戰鬥背景":"Arrière-plan de combat en RA","開啟後戰鬥使用鏡頭畫面（進入戰鬥時才會請求許可權）":"Une fois activé, le combat utilise l'image de la caméra (l'autorisation est demandée au début du combat)","當前環境":"Conditions actuelles","素材致謝":"Crédits graphiques","角色與妖怪來自 LPC（Liberated Pixel Cup）素材":"Personnages et monstres issus des ressources LPC (Liberated Pixel Cup)","收起":"Masquer","檢視":"Voir","清除存檔":"Effacer la sauvegarde","清空全部進度並重新開始":"Effacer toute la progression et recommencer","清除":"Effacer","角色與妖怪影象使用":"Les images des personnages et des monstres utilisent les ressources","素材，經":", assemblées avec","的圖層合成，並對部分圖層重新著色（顏色已修改）。合成後的精靈圖以相同授權條款（CC-BY-SA 3.0 / GPL 3.0）分享。":". Certains calques ont été recolorés (couleurs modifiées). Les sprites obtenus sont partagés sous les mêmes conditions de licence (CC-BY-SA 3.0 / GPL 3.0).","授權":"Licences","作者（{1} 位）":"Auteurs ({1})","來源頁面":"Pages sources","確定清除全部進度嗎？此操作無法恢復。":"Effacer toute la progression ? Cette action est irréversible.","語言":"Langue","選擇遊戲介面語言":"Choisissez la langue de l'interface","升級！Lv.{0} · 傷害提升":"Niveau supérieur ! Niv. {0} · Dégâts en hausse","妖王·{0}":"Roi {0}","精英·{0}":"{0} d'élite","妖王·":"Roi ","精英·":"Élite ","遭遇 {0}！":"{0} apparaît !","⚔ 飛劍符加持，傷害提升":"⚔ Talisman d'épée actif : dégâts accrus","向上滑動手指，甩出飛劍！":"Glissez vers le haut pour lancer l'épée !","⚠ 妖邪蓄力中！命中可打斷":"⚠ Le démon charge ! Touchez-le pour l'interrompre","{0} 正在蓄力…":"{0} charge son attaque…","{0} 反擊！劍氣 -1":"{0} contre-attaque ! Qi d'épée -1","飛劍命中！造成 {0} 點傷害":"L'épée touche ! {0} dégâts","✦ 成功打斷妖邪蓄力！":"✦ Charge interrompue !","{0} 被斬殺！":"{0} a été terrassé !","斬妖成功！":"Démon terrassé !","劍氣耗盡，力竭撤退…":"Qi d'épée épuisé — repli, à bout de forces…","力竭撤退，運功調息後可再戰":"Repli épuisé. Méditez, puis repartez au combat","力竭撤退，劍氣恢復至 {0}":"Repli épuisé. Qi d'épée restauré à {0}","（精英）":"(élite)","靈石 +{0}（精英）":"Pierres spirituelles +{0} (élite)","靈石 +{0}":"Pierres spirituelles +{0}","妖王掉落：妖丹×2 引妖香×1":"Butin du roi démon : noyau démoniaque ×2, encens d'appât ×1","⚠ 妖王現身！":"⚠ Un roi démon apparaît !","妖丹 ×1":"Noyau démoniaque ×1","回氣丹 ×1":"Pilule de Qi ×1","飛劍符 ×1":"Talisman d'épée ×1","獲得":"Obtenu","獲得 {0}":"Obtenu : {0}","一劍斬妖！":"Un coup, un démon terrassé !","預設位置（北京）· 點選妖邪或道場開始":"Position par défaut (Pékin) · Touchez un démon ou un dojo pour commencer","點選妖邪或道場開始":"Touchez un démon ou un dojo pour commencer","調息運功，劍氣 +1":"Méditation : Qi d'épée +1","已讀取存檔 · Lv.{0}":"Sauvegarde chargée · Niv. {0}","步行達 {0} km，靈石 +5":"Marche : {0} km · pierres spirituelles +5","{0} 已切換至預設位置（北京）。":"{0} Position par défaut (Pékin) utilisée.","重新定位…":"Nouvelle localisation…","開始御劍":"Commencer","定位成功 — 點選開始":"Position trouvée — touchez pour commencer","遊戲暫停中… 回到頁面繼續":"Jeu en pause… revenez sur la page pour continuer","飛劍 · 御劍尋蹤":"Épée volante · Quête d'épée","御劍者":"Cavalier d'épée","斬妖":"Victoires","劍氣":"Qi","⚔ 劍氣":"⚔ Qi d'épée","行囊":"Sac","物品":"Objets","圖鑑":"Codex","任務":"Quêtes","修煉":"Progrès","設定":"Réglages","正在初始化…":"Initialisation…","劍意消散":"L'intention s'est dissipée","斬妖數":"Démons terrassés","重入江湖":"Retourner dans le jianghu","物品欄":"Sac","指南針":"Boussole","回到當前位置":"Revenir à ma position","放大":"Zoom avant","縮小":"Zoom arrière"},"zh-CN":{"赤炎妖":"赤炎妖","幽冥鬼":"幽冥鬼","噬魂鼠":"噬魂鼠","獠牙精":"獠牙精","蛟龍子":"蛟龙子","魅影狐":"魅影狐","枯骨怪":"枯骨怪","夜叉王":"夜叉王","青龍壇":"青龙坛","白虎壇":"白虎坛","朱雀壇":"朱雀坛","玄武壇":"玄武坛","天劍道場":"天剑道场","雲隱道場":"云隐道场","飛劍符":"飞剑符","下次戰鬥自動消耗，傷害提升 60%":"下次战斗自动消耗，伤害提升 60%","回氣丹":"回气丹","立即恢復 1 點劍氣":"立即恢复 1 点剑气","妖丹":"妖丹","練妖壺孵化材料，集齊 3 顆可孵化妖怪":"练妖壶孵化材料，集齐 3 颗可孵化妖怪","引妖香":"引妖香","立即引來 4 只妖邪（戰鬥中不可用）":"立即引来 4 只妖邪（战斗中不可用）","AR 開":"AR 开","AR 關":"AR 关","靈界視界":"灵界视界","鏡頭不可用":"镜头不可用","已切換至靈界視界":"已切换至灵界视界","鏡頭不可用:":"镜头不可用:","已切換至預設位置（北京）。":"已切换至默认位置（北京）。","您的瀏覽器不支援地理定位，":"您的浏览器不支持地理定位，","步行達":"步行达","km，靈石 +5":"km，灵石 +5","定位失敗：":"定位失败：","請允許定位許可權。":"请允许定位权限。","位置資訊不可用。":"位置信息不可用。","定位超時。":"定位超时。","定位失敗：請允許定位許可權。":"定位失败：请允许定位权限。","定位失敗：位置資訊不可用。":"定位失败：位置信息不可用。","定位失敗：定位超時。":"定位失败：定位超时。","王":"王","精":"精","道":"道","泉":"泉","一隻妖邪遁走了，新的妖邪出現…":"一只妖邪遁走了，新的妖邪出现…","已佔領 · 我方":"已占领 · 我方","再次挑戰":"再次挑战","中立道場":"中立道场","挑戰道場":"挑战道场","調息中 {0}s":"调息中 {0}s","守衛產出：💎 {0} / 30（每分鐘 +1）":"守卫产出：💎 {0} / 30（每分钟 +1）","佔領後可持續產出靈石":"占领后可持续产出灵石","道場調息中，請稍後再來":"道场调息中，请稍后再来","道場":"道场","守軍":"守军","挑戰獎勵：":"挑战奖励：","妖丹 ×2":"妖丹 ×2","道場守軍實力強於普通妖邪":"道场守军实力强于普通妖邪","收取靈石":"收取灵石","收取守衛產出：靈石 +{0}":"收取守卫产出：灵石 +{0}","（道場守軍）":"（道场守军）","{0}（道場守軍）":"{0}（道场守军）","道場攻佔成功！獲得妖丹×2 飛劍符×1":"道场攻占成功！获得妖丹×2 飞剑符×1","攻佔 {0}！妖丹×2 飛劍符×1":"攻占 {0}！妖丹×2 飞剑符×1","使用":"使用","自動":"自动","點燃":"点燃","孵化":"孵化","引妖香點燃，妖邪被吸引而來！":"引妖香点燃，妖邪被吸引而来！","劍氣已滿":"剑气已满","使用回氣丹，劍氣 +1":"使用回气丹，剑气 +1","孵化完成！":"孵化完成！","{1} 已成形":"{1} 已成形","領取妖怪":"领取妖怪","孵化中… 剩餘 {0} 秒":"孵化中… 剩余 {0} 秒","正在妖氣中成形…":"正在妖气中成形…","練妖壺":"练妖壶","放入 {0} 顆妖丹，":"放入 {0} 颗妖丹，","可孵化出一隻稀有妖怪。":"可孵化出一只稀有妖怪。","當前妖丹：{1} 顆":"当前妖丹：{1} 颗","啟動孵化":"启动孵化","練妖壺啟動，30 秒後孵化":"练妖壶启动，30 秒后孵化","孵化成功：{0}":"孵化成功：{0}","妖怪圖鑑 {0}/{1} · 步行 {2} km":"妖怪图鉴 {0}/{1} · 步行 {2} km","尚未收服任何妖怪":"尚未收服任何妖怪","擊敗妖邪有機會收服，也可用練妖壺孵化":"击败妖邪有机会收服，也可用练妖壶孵化","點選已收服的妖怪可令其出戰":"点击已收服的妖怪可令其出战","✦出戰":"✦出战","我的妖怪":"我的妖怪","收服 {0}！":"收服 {0}！","{0} Lv.{1} ✦出戰":"{0} Lv.{1} ✦出战","{0} Lv.{1}":"{0} Lv.{1}","{0} ×{1}":"{0} ×{1}","附近暫無妖邪":"附近暂无妖邪","👑 妖王":"👑 妖王","⭐ 精英妖邪":"⭐ 精英妖邪","妖邪":"妖邪","附近妖邪":"附近妖邪","正在獲取位置…":"正在获取位置…","擊敗 1 只精英妖邪":"击败 1 只精英妖邪","攻佔 / 挑戰道場 1 次":"攻占 / 挑战道场 1 次","用練妖壺孵化 1 只妖怪":"用练妖壶孵化 1 只妖怪","使用 2 次靈泉補給":"使用 2 次灵泉补给","斬殺 10 只妖邪":"斩杀 10 只妖邪","斬殺 5 只妖邪":"斩杀 5 只妖邪","任務完成：":"任务完成：","任務完成：{0}":"任务完成：{0}","每日任務 · 次日自動重新整理":"每日任务 · 次日自动刷新","已領取":"已领取","領取":"领取","進度 {2} / {3} · 獎勵 {4}":"进度 {2} / {3} · 奖励 {4}","領取獎勵：靈石 +{0}":"领取奖励：灵石 +{0}","劍氣上限":"剑气上限","最大劍氣 +1":"最大剑气 +1","劍意":"剑意","飛劍傷害 +8%":"飞剑伤害 +8%","調息":"调息","地圖上劍氣恢復更快":"地图上剑气恢复更快","靈石：💎 {0}":"灵石：💎 {0}","已滿":"已满","擊敗妖邪、完成任務、攻佔道場可獲得靈石":"击败妖邪、完成任务、攻占道场可获得灵石","靈石不足":"灵石不足","{0} 提升至 Lv.{1}":"{0} 提升至 Lv.{1}","妖寵已收回":"妖宠已收回","{0} 出戰！傷害 +{1}%":"{0} 出战！伤害 +{1}%","{0} 升到 Lv.{1}！":"{0} 升到 Lv.{1}！","靈市":"灵市","購買 {0}":"购买 {0}","靈泉恢復中":"灵泉恢复中","靈泉恢復中 {0} 秒":"灵泉恢复中 {0} 秒","秒":"秒","距離靈泉 {0}m，靠近到 80m 內再來":"距离灵泉 {0}m，靠近到 80m 内再来","靈石×":"灵石×","靈泉補給：":"灵泉补给：","靈泉補給：{0}":"灵泉补给：{0}","晴":"晴","陰":"阴","霧":"雾","雨":"雨","雪":"雪","雷雨":"雷雨","☀️晴":"☀️晴","☁️陰":"☁️阴","🌫️霧":"🌫️雾","🌧️雨":"🌧️雨","❄️雪":"❄️雪","⛈️雷雨":"⛈️雷雨","夜間精英更多":"夜间精英更多","靈石加成":"灵石加成","精英更多":"精英更多","🌙 夜":"🌙 夜","☀️ 晝":"☀️ 昼","夜晚：精英妖邪更常出現":"夜晚：精英妖邪更常出现","白天":"白天","天氣未獲取":"天气未获取","音效":"音效","戰鬥與拾取提示音":"战斗与拾取提示音","開":"开","關":"关","AR 戰鬥背景":"AR 战斗背景","開啟後戰鬥使用鏡頭畫面（進入戰鬥時才會請求許可權）":"打开后战斗使用镜头画面（进入战斗时才会请求权限）","當前環境":"当前环境","素材致謝":"素材致谢","角色與妖怪來自 LPC（Liberated Pixel Cup）素材":"角色与妖怪来自 LPC（Liberated Pixel Cup）素材","收起":"收起","檢視":"查看","清除存檔":"清除存档","清空全部進度並重新開始":"清空全部进度并重新开始","清除":"清除","角色與妖怪影象使用":"角色与妖怪图像使用","素材，經":"素材，经","的圖層合成，並對部分圖層重新著色（顏色已修改）。合成後的精靈圖以相同授權條款（CC-BY-SA 3.0 / GPL 3.0）分享。":"的图层合成，并对部分图层重新着色（颜色已修改）。合成后的精灵图以相同授权条款（CC-BY-SA 3.0 / GPL 3.0）分享。","授權":"授权","作者（{1} 位）":"作者（{1} 位）","來源頁面":"来源页面","確定清除全部進度嗎？此操作無法恢復。":"确定清除全部进度吗？此操作无法恢复。","語言":"语言","選擇遊戲介面語言":"选择游戏界面语言","升級！Lv.{0} · 傷害提升":"升级！Lv.{0} · 伤害提升","妖王·{0}":"妖王·{0}","精英·{0}":"精英·{0}","妖王·":"妖王·","精英·":"精英·","遭遇 {0}！":"遭遇 {0}！","⚔ 飛劍符加持，傷害提升":"⚔ 飞剑符加持，伤害提升","向上滑動手指，甩出飛劍！":"向上滑动手指，甩出飞剑！","⚠ 妖邪蓄力中！命中可打斷":"⚠ 妖邪蓄力中！命中可打断","{0} 正在蓄力…":"{0} 正在蓄力…","{0} 反擊！劍氣 -1":"{0} 反击！剑气 -1","飛劍命中！造成 {0} 點傷害":"飞剑命中！造成 {0} 点伤害","✦ 成功打斷妖邪蓄力！":"✦ 成功打断妖邪蓄力！","{0} 被斬殺！":"{0} 被斩杀！","斬妖成功！":"斩妖成功！","劍氣耗盡，力竭撤退…":"剑气耗尽，力竭撤退…","力竭撤退，運功調息後可再戰":"力竭撤退，运功调息后可再战","力竭撤退，劍氣恢復至 {0}":"力竭撤退，剑气恢复至 {0}","（精英）":"（精英）","靈石 +{0}（精英）":"灵石 +{0}（精英）","靈石 +{0}":"灵石 +{0}","妖王掉落：妖丹×2 引妖香×1":"妖王掉落：妖丹×2 引妖香×1","⚠ 妖王現身！":"⚠ 妖王现身！","妖丹 ×1":"妖丹 ×1","回氣丹 ×1":"回气丹 ×1","飛劍符 ×1":"飞剑符 ×1","獲得":"获得","獲得 {0}":"获得 {0}","一劍斬妖！":"一剑斩妖！","預設位置（北京）· 點選妖邪或道場開始":"默认位置（北京）· 点击妖邪或道场开始","點選妖邪或道場開始":"点击妖邪或道场开始","調息運功，劍氣 +1":"调息运功，剑气 +1","已讀取存檔 · Lv.{0}":"已读取存档 · Lv.{0}","步行達 {0} km，靈石 +5":"步行达 {0} km，灵石 +5","{0} 已切換至預設位置（北京）。":"{0} 已切换至默认位置（北京）。","重新定位…":"重新定位…","開始御劍":"开始御剑","定位成功 — 點選開始":"定位成功 — 点击开始","遊戲暫停中… 回到頁面繼續":"游戏暂停中… 回到页面继续","飛劍 · 御劍尋蹤":"飞剑 · 御剑寻踪","御劍者":"御剑者","斬妖":"斩妖","劍氣":"剑气","⚔ 劍氣":"⚔ 剑气","行囊":"行囊","物品":"物品","圖鑑":"图鉴","任務":"任务","修煉":"修炼","設定":"设置","正在初始化…":"正在初始化…","劍意消散":"剑意消散","斬妖數":"斩妖数","重入江湖":"重入江湖","物品欄":"物品栏","指南針":"指南针","回到當前位置":"回到当前位置","放大":"放大","縮小":"缩小"}};
             const HTML_I18N = {"start_h1":{"zh-TW":"御劍<span>尋蹤</span>","en":"Sword <span>Quest</span>","fr":"Quête d'<span>épée</span>","zh-CN":"御剑<span>寻踪</span>"},"start_p":{"zh-TW":"踏上真實地圖，點選出現的 <em>妖邪</em> 標記。<br>進入 <em>AR 戰鬥</em>，向上滑動手指<br>蓄力將飛劍沿弧線甩向妖怪。<br>攻佔 <em>道場</em>、收集 <em>妖丹</em>，練妖壺孵化萬物。<br><small style=\"color:#4a6a8a; font-size:12px;\">需鏡頭與定位許可權 · 定位失敗預設北京</small>","en":"Explore the real-world map and tap the <em>fiend</em> markers.<br>Enter an <em>AR battle</em> and swipe up<br>to charge your flying sword and hurl it in an arc at the monster.<br>Capture <em>dojos</em>, collect <em>demon cores</em>, and hatch monsters in the cauldron.<br><small style=\"color:#4a6a8a; font-size:12px;\">Needs camera and location permission · If location fails, defaults to Beijing</small>","fr":"Parcourez la vraie carte et touchez les marqueurs de <em>démons</em>.<br>Entrez dans un <em>combat en RA</em> et glissez vers le haut<br>pour charger l'épée volante et la lancer en arc vers le monstre.<br>Conquérez des <em>dojos</em>, récoltez des <em>noyaux démoniaques</em> et faites éclore des monstres au chaudron.<br><small style=\"color:#4a6a8a; font-size:12px;\">Caméra et localisation requises · En cas d'échec, position par défaut : Pékin</small>","zh-CN":"踏上真实地图，点击出现的 <em>妖邪</em> 标记。<br>进入 <em>AR 战斗</em>，向上滑动手指<br>蓄力将飞剑沿弧线甩向妖怪。<br>攻占 <em>道场</em>、收集 <em>妖丹</em>，练妖壶孵化万物。<br><small style=\"color:#4a6a8a; font-size:12px;\">需镜头与定位权限 · 定位失败默认北京</small>"},"gym_rewards":{"zh-TW":"挑戰獎勵：<strong>妖丹 ×2</strong> · <strong>飛劍符 ×1</strong><br><small style=\"color:#4a6a8a; font-size:11px;\">道場守軍實力強於普通妖邪</small>","en":"Challenge reward: <strong>Demon Core ×2</strong> · <strong>Sword Talisman ×1</strong><br><small style=\"color:#4a6a8a; font-size:11px;\">Dojo guardians are stronger than ordinary fiends</small>","fr":"Récompense du défi : <strong>noyau démoniaque ×2</strong> · <strong>talisman d'épée ×1</strong><br><small style=\"color:#4a6a8a; font-size:11px;\">Les gardiens de dojo sont plus forts que les démons ordinaires</small>","zh-CN":"挑战奖励：<strong>妖丹 ×2</strong> · <strong>飞剑符 ×1</strong><br><small style=\"color:#4a6a8a; font-size:11px;\">道场守军实力强于普通妖邪</small>"}};
             const CHARMAP_CN = {"丟":"丢","並":"并","佔":"占","來":"来","個":"个","傷":"伤","僅":"仅","優":"优","內":"内","劍":"剑","動":"动","務":"务","勝":"胜","勢":"势","勵":"励","區":"区","啟":"启","嗎":"吗","圓":"圆","圖":"图","場":"场","壇":"坛","壓":"压","壺":"壶","實":"实","寬":"宽","寵":"宠","將":"将","尋":"寻","對":"对","層":"层","屬":"属","幀":"帧","強":"强","後":"后","復":"复","態":"态","應":"应","戰":"战","戲":"戏","換":"换","搖":"摇","擇":"择","擊":"击","攔":"拦","敗":"败","敵":"敌","數":"数","斬":"斩","斷":"断","於":"于","時":"时","晝":"昼","暫":"暂","會":"会","條":"条","標":"标","機":"机","檔":"档","檢":"检","欄":"栏","權":"权","殺":"杀","氣":"气","準":"准","滿":"满","瀏":"浏","為":"为","無":"无","煉":"炼","狀":"状","獎":"奖","獲":"获","現":"现","環":"环","產":"产","畫":"画","當":"当","盡":"尽","確":"确","簡":"简","紅":"红","級":"级","結":"结","給":"给","經":"经","緒":"绪","線":"线","編":"编","練":"练","縮":"缩","繫":"系","繼":"继","續":"续","與":"与","舊":"旧","萬":"万","著":"着","號":"号","蠍":"蝎","衛":"卫","補":"补","見":"见","視":"视","覽":"览","計":"计","訊":"讯","託":"托","記":"记","設":"设","許":"许","語":"语","調":"调","請":"请","謝":"谢","讀":"读","負":"负","買":"买","資":"资","購":"购","蹤":"踪","軍":"军","輯":"辑","進":"进","遊":"游","運":"运","達":"达","選":"选","邏":"逻","針":"针","鈕":"钮","錄":"录","鏡":"镜","鐘":"钟","鑑":"鉴","長":"长","開":"开","間":"间","關":"关","陰":"阴","隨":"随","隱":"隐","隻":"只","離":"离","雲":"云","霧":"雾","靈":"灵","響":"响","頁":"页","預":"预","領":"领","頭":"头","顆":"颗","顏":"颜","顯":"显","飛":"飞","餘":"余","體":"体","鬥":"斗","點":"点","齊":"齐","龍":"龙"};
+            // ---- 妖怪合成：配方與譯名 ----
+            const FUSE_RECIPES = [[0, 1, "煉獄魔"], [0, 2, "焚魂鼠"], [0, 3, "烈牙獸"], [0, 4, "炎蛟"], [0, 5, "火狐仙"], [0, 6, "焦骨魔"], [0, 7, "烈焰夜叉"], [1, 2, "鬼鼠"], [1, 3, "幽牙鬼"], [1, 4, "冥蛟"], [1, 5, "幽狐"], [1, 6, "骷髏鬼"], [1, 7, "冥夜叉"], [2, 3, "鼠牙精"], [2, 4, "魂蛟"], [2, 5, "魂影狐"], [2, 6, "噬骨鼠"], [2, 7, "噬魂夜叉"], [3, 4, "牙蛟"], [3, 5, "影牙狐"], [3, 6, "骨牙精"], [3, 7, "牙夜叉"], [4, 5, "龍狐"], [4, 6, "骨龍"], [4, 7, "龍夜叉"], [5, 6, "影骨怪"], [5, 7, "影夜叉"], [6, 7, "骨夜叉"]];
+            const FUSE_I18N = {"en": {"煉獄魔": "Inferno Wraith", "焚魂鼠": "Cinder Soulrat", "烈牙獸": "Blazefang", "炎蛟": "Flame Drake", "火狐仙": "Fire Fox Spirit", "焦骨魔": "Charred Bone Fiend", "烈焰夜叉": "Blaze Yaksha", "鬼鼠": "Ghost Rat", "幽牙鬼": "Phantom Fang", "冥蛟": "Nether Drake", "幽狐": "Spectral Fox", "骷髏鬼": "Skull Wraith", "冥夜叉": "Nether Yaksha", "鼠牙精": "Gnawfang", "魂蛟": "Soul Drake", "魂影狐": "Soul Fox", "噬骨鼠": "Bonegnaw Rat", "噬魂夜叉": "Soul-Eater Yaksha", "牙蛟": "Fang Drake", "影牙狐": "Shadowfang Fox", "骨牙精": "Bonefang", "牙夜叉": "Fang Yaksha", "龍狐": "Dragon Fox", "骨龍": "Bone Dragon", "龍夜叉": "Dragon Yaksha", "影骨怪": "Shade Skeleton", "影夜叉": "Shadow Yaksha", "骨夜叉": "Bone Yaksha", "合成": "Fuse", "合成爐": "Fusion Furnace", "選兩隻妖怪放入爐中，合成為更強的新妖怪。": "Pick two monsters to fuse into a stronger new one.", "每次合成消耗 {1} 顆妖丹，材料妖怪會消失；階級越高，出戰加成越大。": "Each fusion costs {1} demon cores and consumes both monsters; higher tiers give a bigger battle bonus.", "已選 {1}/2": "Selected {1}/2", "預覽：{1}": "Preview: {1}", "首次合成將解鎖圖鑑": "Fuse it once to unlock its codex entry.", "開始合成": "Start Fusion", "妖丹不足（需 {1} 顆）": "Not enough demon cores ({1} needed)", "請先選擇 2 隻材料": "Select 2 monsters first", "合成圖鑑 {1}/{2}": "Fusion Codex {1}/{2}", "點選妖怪選為材料，再點一次取消": "Tap monsters to select them; tap again to deselect.", "{1} 與 {2} 合成為 {3}！": "{1} + {2} fused into {3}!", "妖丹不足，無法合成": "Not enough demon cores to fuse", "至少需要 2 隻妖怪才能合成": "You need at least 2 monsters to fuse", "材料妖怪": "Material monsters"}, "fr": {"煉獄魔": "Spectre d'Enfer", "焚魂鼠": "Rat de Cendre", "烈牙獸": "Croc Ardent", "炎蛟": "Dragonnet Ardent", "火狐仙": "Renard de Feu", "焦骨魔": "Démon Calciné", "烈焰夜叉": "Yaksha Flamboyant", "鬼鼠": "Rat Fantôme", "幽牙鬼": "Croc Spectral", "冥蛟": "Dragonnet des Limbes", "幽狐": "Renard Spectral", "骷髏鬼": "Spectre Squelette", "冥夜叉": "Yaksha des Limbes", "鼠牙精": "Croc-Rongeur", "魂蛟": "Dragonnet des Âmes", "魂影狐": "Renard des Âmes", "噬骨鼠": "Rat Ronge-Os", "噬魂夜叉": "Yaksha Mange-Âmes", "牙蛟": "Dragonnet Croc", "影牙狐": "Renard Croc-d'Ombre", "骨牙精": "Croc d'Os", "牙夜叉": "Yaksha Croc", "龍狐": "Renard-Dragon", "骨龍": "Dragon d'Os", "龍夜叉": "Yaksha-Dragon", "影骨怪": "Squelette d'Ombre", "影夜叉": "Yaksha d'Ombre", "骨夜叉": "Yaksha d'Os", "合成": "Fusion", "合成爐": "Fourneau de fusion", "選兩隻妖怪放入爐中，合成為更強的新妖怪。": "Choisissez deux monstres à fusionner en un monstre plus puissant.", "每次合成消耗 {1} 顆妖丹，材料妖怪會消失；階級越高，出戰加成越大。": "Chaque fusion coûte {1} noyaux démoniaques et consomme les deux monstres ; plus le rang est élevé, plus le bonus de combat est grand.", "已選 {1}/2": "Sélection {1}/2", "預覽：{1}": "Aperçu : {1}", "首次合成將解鎖圖鑑": "Fusionnez-le une fois pour l’ajouter au codex.", "開始合成": "Fusionner", "妖丹不足（需 {1} 顆）": "Pas assez de noyaux démoniaques ({1} requis)", "請先選擇 2 隻材料": "Sélectionnez d’abord 2 monstres", "合成圖鑑 {1}/{2}": "Codex de fusion {1}/{2}", "點選妖怪選為材料，再點一次取消": "Touchez un monstre pour le choisir, touchez à nouveau pour annuler.", "{1} 與 {2} 合成為 {3}！": "{1} et {2} fusionnent en {3} !", "妖丹不足，無法合成": "Pas assez de noyaux démoniaques", "至少需要 2 隻妖怪才能合成": "Il faut au moins 2 monstres pour fusionner", "材料妖怪": "Monstres matériaux"}, "zh-CN": {"煉獄魔": "炼狱魔", "焚魂鼠": "焚魂鼠", "烈牙獸": "烈牙兽", "炎蛟": "炎蛟", "火狐仙": "火狐仙", "焦骨魔": "焦骨魔", "烈焰夜叉": "烈焰夜叉", "鬼鼠": "鬼鼠", "幽牙鬼": "幽牙鬼", "冥蛟": "冥蛟", "幽狐": "幽狐", "骷髏鬼": "骷髅鬼", "冥夜叉": "冥夜叉", "鼠牙精": "鼠牙精", "魂蛟": "魂蛟", "魂影狐": "魂影狐", "噬骨鼠": "噬骨鼠", "噬魂夜叉": "噬魂夜叉", "牙蛟": "牙蛟", "影牙狐": "影牙狐", "骨牙精": "骨牙精", "牙夜叉": "牙夜叉", "龍狐": "龙狐", "骨龍": "骨龙", "龍夜叉": "龙夜叉", "影骨怪": "影骨怪", "影夜叉": "影夜叉", "骨夜叉": "骨夜叉", "合成": "合成", "合成爐": "合成炉", "選兩隻妖怪放入爐中，合成為更強的新妖怪。": "选两只妖怪放入炉中，合成为更强的新妖怪。", "每次合成消耗 {1} 顆妖丹，材料妖怪會消失；階級越高，出戰加成越大。": "每次合成消耗 {1} 颗妖丹，材料妖怪会消失；阶级越高，出战加成越大。", "已選 {1}/2": "已选 {1}/2", "預覽：{1}": "预览：{1}", "首次合成將解鎖圖鑑": "首次合成将解锁图鉴", "開始合成": "开始合成", "妖丹不足（需 {1} 顆）": "妖丹不足（需 {1} 颗）", "請先選擇 2 隻材料": "请先选择 2 只材料", "合成圖鑑 {1}/{2}": "合成图鉴 {1}/{2}", "點選妖怪選為材料，再點一次取消": "点选妖怪选为材料，再点一次取消", "{1} 與 {2} 合成為 {3}！": "{1} 与 {2} 合成为 {3}！", "妖丹不足，無法合成": "妖丹不足，无法合成", "至少需要 2 隻妖怪才能合成": "至少需要 2 只妖怪才能合成", "材料妖怪": "材料妖怪"}};
+            for (const L of Object.keys(FUSE_I18N)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N[L]); }
+            const FUSE_I18N2 = {"en": {"突變": "Mutant", "✦ 突變！{1} 變得更強了": "✦ Mutation! {1} grew stronger", "合成 {1} 次 · 靈泉互動範圍 {2} 公尺": "Fusions: {1} · Spring reach: {2} m", "突變機率 {1}%": "Mutation chance {1}%", "合成次數越多，靈泉的可互動範圍越大。": "The more you fuse, the farther you can reach springs.", "靈泉互動範圍提升至 {1} 公尺": "Spring reach increased to {1} m", "距離靈泉 {1}m，靠近到 {2}m 內再來": "Spring is {1} m away — get within {2} m"}, "fr": {"突變": "Mutant", "✦ 突變！{1} 變得更強了": "✦ Mutation ! {1} est devenu plus fort", "合成 {1} 次 · 靈泉互動範圍 {2} 公尺": "Fusions : {1} · Portée des sources : {2} m", "突變機率 {1}%": "Chance de mutation {1} %", "合成次數越多，靈泉的可互動範圍越大。": "Plus vous fusionnez, plus la portée des sources augmente.", "靈泉互動範圍提升至 {1} 公尺": "Portée des sources portée à {1} m", "距離靈泉 {1}m，靠近到 {2}m 內再來": "Source à {1} m — approchez-vous à moins de {2} m"}, "zh-CN": {"突變": "突变", "✦ 突變！{1} 變得更強了": "✦ 突变！{1} 变得更强了", "合成 {1} 次 · 靈泉互動範圍 {2} 公尺": "合成 {1} 次 · 灵泉互动范围 {2} 米", "突變機率 {1}%": "突变概率 {1}%", "合成次數越多，靈泉的可互動範圍越大。": "合成次数越多，灵泉的可互动范围越大。", "靈泉互動範圍提升至 {1} 公尺": "灵泉互动范围提升至 {1} 米", "距離靈泉 {1}m，靠近到 {2}m 內再來": "距离灵泉 {1}m，靠近到 {2}m 内再来"}};
+            for (const L of Object.keys(FUSE_I18N2)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N2[L]); }
             const I18N_LANGS = ['en', 'fr', 'zh-CN', 'zh-TW'];
             const I18N_LANG_NAMES = [['en', 'English'], ['fr', 'Français'], ['zh-CN', '简体中文'], ['zh-TW', '繁體中文']];
             const CJK_RE = /[㐀-鿿]/;
@@ -1251,7 +1263,13 @@
                 dropQiPill: 0.25,
                 dropSwordCharm: 0.15,
                 // 練妖壺
-                kilnCost: 3,            // 需要妖丹數
+                kilnCost: 3,
+                fuseCost: 2,            // 合成需要妖丹數
+                fuseMaxTier: 3,
+                mutateChance: 0.2,      // 合成突變機率
+                stopReach: 80,          // 靈泉基礎互動範圍（公尺）
+                reachPerFuse: 10,       // 每次合成增加的互動範圍
+                reachMaxBonus: 200,     // 互動範圍加成上限            // 需要妖丹數
                 kilnDuration: 30000     // 孵化時間 ms
             };
 
@@ -1303,6 +1321,13 @@
                 '青龙坛': '青龍壇', '白虎坛': '白虎壇', '朱雀坛': '朱雀壇', '玄武坛': '玄武壇', '天剑道场': '天劍道場', '云隐道场': '雲隱道場' };
             function fixName(n) { return LEGACY_NAMES[n] || n; }
             function enemyByEmoji(e) { return ENEMIES.find(x => x.emoji === e) || null; }
+            function dispName(c) { return (c.mut ? '突變 · ' : '') + c.name; }
+            function reachM() { return CONFIG.stopReach + Math.min(CONFIG.reachMaxBonus, (state.fuseCount || 0) * CONFIG.reachPerFuse); }
+            function fxSpr(c, opts) {
+                const h = sprFor(c.emoji, opts);
+                if (!c.tier && !c.hue && !c.mut) return h;
+                return `<span style="display:inline-block;line-height:0;filter:hue-rotate(${c.hue || 0}deg) saturate(1.2) drop-shadow(0 0 ${2 + (c.tier || 0) * 2 + (c.mut ? 3 : 0)}px ${c.mut ? 'rgba(255,90,220,0.95)' : 'rgba(255,209,102,0.9)'})">${h}</span>`;
+            }
             function sprFor(emoji, opts) {
                 const e = enemyByEmoji(emoji);
                 return e ? spr(e.name, opts) : '';
@@ -1381,7 +1406,7 @@
                 radarCollapsed: false,
                 radarTimer: null,
                 inventory: { swordCharm: 0, qiPill: 0, demonCore: 0, incense: 0 },
-                stones: 0, quests: [], questDate: '', companion: null, lastLevel: null, regenAcc: 0,
+                stones: 0, fused: {}, fuseCount: 0, fuseSel: [], quests: [], questDate: '', companion: null, lastLevel: null, regenAcc: 0,
                 stops: [], stopIdSeq: 0, walked: 0, dex: {}, savedWorld: null, killCount: 0, weather: null, worldAnchor: null, envTimer: null,
                 collection: [],
                 kiln: {
@@ -2021,11 +2046,111 @@
                     ? '<div class="collection-empty">尚未收服任何妖怪<br>擊敗妖邪有機會收服，也可用練妖壺孵化<br>點選已收服的妖怪可令其出戰</div>'
                     : '<div class="collection-grid">' + state.collection.map(c => `
                         <div class="collection-card${state.companion && state.companion.time === c.time ? ' equipped' : ''}" data-time="${c.time}">
-                            <div class="collection-emoji">${sprFor(c.emoji, { px: 56 })}</div>
-                            <div class="collection-name">${c.name} Lv.${c.lv || 1}${state.companion && state.companion.time === c.time ? ' ✦出戰' : ''}</div>
+                            <div class="collection-emoji">${fxSpr(c, { px: 56 })}</div>
+                            <div class="collection-name">${dispName(c)}${c.tier ? ' ★' + c.tier : ''} Lv.${c.lv || 1}${state.companion && state.companion.time === c.time ? ' ✦出戰' : ''}</div>
                         </div>`).join('') + '</div>';
                 el.innerHTML = head + '<div class="collection-grid" style="margin-bottom:14px;">' + dexHtml + '</div>' +
                     '<div class="kiln-hint" style="text-align:center;margin-bottom:8px;">我的妖怪</div>' + owned;
+            }
+
+
+            // ============================================================
+            // 妖怪合成（仿軒轅劍：兩隻妖怪合成為新妖怪）
+            // ============================================================
+            function fuseResult(a, b) {
+                const ia = ENEMIES.findIndex(x => x.emoji === a.emoji), ib = ENEMIES.findIndex(x => x.emoji === b.emoji);
+                const tier = Math.min(CONFIG.fuseMaxTier, Math.max(a.tier || 0, b.tier || 0) + 1);
+                const lv = Math.min(10, Math.max(a.lv || 1, b.lv || 1));
+                if (ia === ib) {
+                    const t = (a.tier || 0) >= (b.tier || 0) ? a : b;
+                    return { emoji: t.emoji, name: t.name, hue: t.hue || 0, key: t.fkey || null, tier, lv };
+                }
+                const i = Math.min(ia, ib), j = Math.max(ia, ib);
+                const r = FUSE_RECIPES.find(x => x[0] === i && x[1] === j);
+                return { emoji: ENEMIES[i].emoji, name: r[2], hue: (i * 47 + j * 83 + 40) % 360, key: i + '-' + j, tier, lv };
+            }
+            function renderFuse() {
+                const el = document.getElementById('tab-fuse');
+                if (!el) return;
+                state.fuseSel = state.fuseSel.filter(t => state.collection.some(c => c.time === t));
+                const sel = state.fuseSel.map(t => state.collection.find(c => c.time === t));
+                const cost = CONFIG.fuseCost;
+                const have = state.inventory.demonCore;
+                let preview = '';
+                let res = null;
+                if (sel.length === 2) {
+                    res = fuseResult(sel[0], sel[1]);
+                    const known = !res.key || state.fused[res.key];
+                    preview = `<div class="kiln-hint" style="text-align:center;color:#ffd166;font-weight:700;">預覽：${known ? res.name + ' ★' + res.tier : '???'}</div>` +
+                        (known ? '' : '<div class="kiln-hint" style="text-align:center;">首次合成將解鎖圖鑑</div>');
+                }
+                const slot = c => `<div class="fuse-slot">${c ? fxSpr(c, { px: 56 }) : '<span style="color:#6a8aaf;font-size:22px;">?</span>'}</div>`;
+                const canGo = sel.length === 2 && have >= cost;
+                let btnLabel = '開始合成';
+                if (sel.length < 2) btnLabel = '請先選擇 2 隻材料';
+                else if (have < cost) btnLabel = `妖丹不足（需 ${cost} 顆）`;
+                const own = state.collection.length < 2
+                    ? '<div class="collection-empty">至少需要 2 隻妖怪才能合成</div>'
+                    : '<div class="collection-grid">' + state.collection.map(c => `
+                        <div class="collection-card fuse-card${state.fuseSel.includes(c.time) ? ' equipped' : ''}" data-fuse-pick="${c.time}">
+                            <div class="collection-emoji">${fxSpr(c, { px: 48 })}</div>
+                            <div class="collection-name">${dispName(c)}${c.tier ? ' ★' + c.tier : ''} Lv.${c.lv || 1}</div>
+                        </div>`).join('') + '</div>';
+                const found = FUSE_RECIPES.filter(r => state.fused[r[0] + '-' + r[1]]).length;
+                const codex = '<div class="collection-grid" style="margin-top:6px;">' + FUSE_RECIPES.map(r => {
+                    const k = r[0] + '-' + r[1];
+                    const h = (r[0] * 47 + r[1] * 83 + 40) % 360;
+                    const e = ENEMIES[r[0]];
+                    return state.fused[k]
+                        ? `<div class="dex-card"><div class="collection-emoji">${fxSpr({ emoji: e.emoji, hue: h, tier: 1 }, { px: 44 })}</div><div class="collection-name">${r[2]}</div></div>`
+                        : `<div class="dex-card unknown"><div class="collection-emoji" style="filter:brightness(0) opacity(0.55)">${sprFor(e.emoji, { px: 44 })}</div><div class="collection-name">???</div></div>`;
+                }).join('') + '</div>';
+                el.innerHTML = `
+                    <div class="kiln-wrap">
+                        <div class="kiln-emoji">⚗️</div>
+                        <div class="kiln-desc">合成爐</div>
+                        <div class="kiln-hint">選兩隻妖怪放入爐中，合成為更強的新妖怪。</div>
+                        <div class="kiln-hint">每次合成消耗 ${cost} 顆妖丹，材料妖怪會消失；階級越高，出戰加成越大。</div>
+                        <div class="kiln-hint">合成次數越多，靈泉的可互動範圍越大。</div>
+                        <div class="kiln-hint" style="color:#7be3b5; font-weight:700;">合成 ${state.fuseCount} 次 · 靈泉互動範圍 ${reachM()} 公尺</div>
+                        <div class="kiln-hint" style="color:#ff8fe8;">突變機率 ${Math.round(CONFIG.mutateChance * 100)}%</div>
+                        <div class="kiln-hint" style="color:#ffd166; font-weight:700;">當前妖丹：${have} 顆</div>
+                        <div class="fuse-slots">${slot(sel[0])}<span class="fuse-op">+</span>${slot(sel[1])}</div>
+                        ${preview}
+                        <button class="btn-modal-action" id="btn-fuse-go" ${canGo ? '' : 'disabled'}>${btnLabel}</button>
+                    </div>
+                    <div class="kiln-hint" style="text-align:center;margin:12px 0 8px;">點選妖怪選為材料，再點一次取消</div>
+                    ${own}
+                    <div class="kiln-hint" style="text-align:center;margin:14px 0 4px;color:#ffd166;font-weight:700;">合成圖鑑 ${found}/${FUSE_RECIPES.length}</div>
+                    ${codex}`;
+            }
+            function doFuse() {
+                if (state.fuseSel.length !== 2) return;
+                if (state.inventory.demonCore < CONFIG.fuseCost) { addToast('妖丹不足，無法合成'); return; }
+                const a = state.collection.find(c => c.time === state.fuseSel[0]);
+                const b = state.collection.find(c => c.time === state.fuseSel[1]);
+                if (!a || !b) { state.fuseSel = []; renderFuse(); return; }
+                const r = fuseResult(a, b);
+                const mut = Math.random() < CONFIG.mutateChance;
+                if (mut) { r.hue = (r.hue + 180) % 360; r.lv = Math.min(10, r.lv + 1); }
+                const oldReach = reachM();
+                state.fuseCount = (state.fuseCount || 0) + 1;
+                state.inventory.demonCore -= CONFIG.fuseCost;
+                if (state.companion && (state.companion.time === a.time || state.companion.time === b.time)) state.companion = null;
+                state.collection = state.collection.filter(c => c !== a && c !== b);
+                const entry = { emoji: r.emoji, name: r.name, time: Date.now(), lv: r.lv, exp: 0, tier: r.tier, hue: r.hue };
+                if (mut) entry.mut = 1;
+                if (r.key) { entry.fkey = r.key; state.fused[r.key] = 1; }
+                state.collection.push(entry);
+                state.fuseSel = [];
+                sfx('pickup');
+                addToast(`${dispName(a)} 與 ${dispName(b)} 合成為 ${dispName(entry)}！`);
+                if (mut) addToast(`✦ 突變！${r.name} 變得更強了`);
+                if (reachM() > oldReach) addToast(`靈泉互動範圍提升至 ${reachM()} 公尺`);
+                updateAvatar();
+                updateInventoryBadge();
+                saveProgress();
+                renderFuse(); renderCollection(); renderInventory(); renderKiln();
             }
 
             // ============================================================
@@ -2036,7 +2161,7 @@
                 ensureKilnTimer();
                 renderInventory();
                 renderKiln();
-                renderCollection();
+                renderCollection(); renderFuse();
                 renderQuests(); renderUpgrades(); renderSettings();
                 // 預設切到物品 tab
                 document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'items'));
@@ -2073,6 +2198,7 @@
                     if (panel) panel.classList.remove('hidden');
                     if (name === 'kiln') renderKiln();
                     if (name === 'collection') renderCollection();
+                    if (name === 'fuse') renderFuse();
                     if (name === 'items') renderInventory();
                     if (name === 'quests') renderQuests();
                     if (name === 'upgrade') renderUpgrades();
@@ -2196,7 +2322,7 @@
                         inventory: state.inventory,
                         collection: state.collection,
                         kiln: state.kiln,
-                        lang: 'tw', stones: state.stones, walked: state.walked, dex: state.dex, upg: UPG, quests: state.quests,
+                        lang: 'tw', stones: state.stones, walked: state.walked, dex: state.dex, fused: state.fused, fuseCount: state.fuseCount, upg: UPG, quests: state.quests,
                         questDate: state.questDate, companion: state.companion, world: buildWorld(), killCount: state.killCount
                     }));
                 } catch (e) {}
@@ -2213,6 +2339,8 @@
                     state.savedWorld = d.world || null;
                     state.killCount = d.killCount | 0;
                     state.dex = d.dex || {};
+                    state.fused = d.fused || {};
+                    state.fuseCount = d.fuseCount | 0;
                     state.quests = (d.lang === 'tw' && Array.isArray(d.quests)) ? d.quests : [];   // 舊存檔任務文字是簡體，重新抽
                     state.questDate = d.questDate || '';
                     state.companion = d.companion || null;
@@ -2341,7 +2469,7 @@
                 if (!av) return;
                 const px = Math.max(30, (av.clientWidth || 46) - 4);
                 const comp = state.companion ? enemyByEmoji(state.companion.emoji) : null;
-                av.innerHTML = comp ? spr(comp.name, { px, crop: true }) : spr('player', { px, crop: true });
+                av.innerHTML = comp ? fxSpr(state.companion, { px, crop: true }) : spr('player', { px, crop: true });
             }
             inventoryModal.addEventListener('click', (e) => {
                 const claim = e.target.closest('[data-claim]');
@@ -2352,6 +2480,16 @@
                 if (buy) { buyShopItem(buy.dataset.buy); return; }
                 const sett = e.target.closest('[data-setting]');
                 if (sett) { handleSetting(sett.dataset.setting); return; }
+                const fp = e.target.closest('[data-fuse-pick]');
+                if (fp) {
+                    const t = parseInt(fp.dataset.fusePick, 10);
+                    const k = state.fuseSel.indexOf(t);
+                    if (k >= 0) state.fuseSel.splice(k, 1);
+                    else { if (state.fuseSel.length >= 2) state.fuseSel.shift(); state.fuseSel.push(t); }
+                    renderFuse();
+                    return;
+                }
+                if (e.target.closest('#btn-fuse-go')) { doFuse(); return; }
                 const card = e.target.closest('.collection-card');
                 if (card) {
                     const time = parseInt(card.dataset.time, 10);
@@ -2415,7 +2553,7 @@
                 }
                 if (!state.usingFallback && state.playerLatLng) {
                     const d = state.playerLatLng.distanceTo(st.latlng);
-                    if (d > 80) { addToast(`距離靈泉 ${Math.round(d)}m，靠近到 80m 內再來`); return; }
+                    if (d > reachM()) { addToast(`距離靈泉 ${Math.round(d)}m，靠近到 ${reachM()}m 內再來`); return; }
                 }
                 const got = [];
                 const pool = [
@@ -2560,7 +2698,7 @@
             function companionMul() {
                 const c = getCompanionEntry();
                 if (!c) return 1;
-                return 1 + 0.10 + 0.02 * (c.lv || 1);
+                return 1 + 0.10 + 0.02 * (c.lv || 1) + 0.06 * (c.tier || 0) + (c.mut ? 0.10 : 0);
             }
             function companionGainExp() {
                 const c = getCompanionEntry();
@@ -3295,7 +3433,7 @@
                 state.kiln = { active: false, startTime: 0, pendingEmoji: null, pendingName: null };
                 if (kilnTimer) { clearInterval(kilnTimer); kilnTimer = null; }
                 state.stones = 0; state.companion = null; state.quests = []; state.questDate = '';
-                state.walked = 0; state.dex = {}; state.savedWorld = null; state.killCount = 0;
+                state.walked = 0; state.dex = {}; state.fused = {}; state.fuseCount = 0; state.fuseSel = []; state.savedWorld = null; state.killCount = 0;
                 state.lastLevel = null; state.regenAcc = 0;
                 Object.assign(UPG, { hp: 0, dmg: 0, regen: 0 });
                 const restored = loadProgress();   // 讀取上次存檔，進度不再丟失
