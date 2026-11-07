@@ -243,6 +243,20 @@
         }
         @keyframes targetFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
         @keyframes ringPulse { 0% { transform: scale(0.7); opacity: 0.8; } 100% { transform: scale(1.4); opacity: 0; } }
+        .target-marker.elite { width: 60px; height: 60px; filter: drop-shadow(0 0 14px rgba(190, 100, 255, 0.9)); }
+        .target-marker.elite .target-core {
+            width: 40px; height: 40px;
+            background: radial-gradient(circle at 35% 35%, #e0a0ff, #6a1fb0);
+            border-color: rgba(255, 220, 120, 0.95);
+            box-shadow: 0 0 26px rgba(190, 100, 255, 0.8);
+        }
+        .target-marker.elite .target-core::after { content: '精'; font-size: 16px; }
+        .target-marker.elite .target-ring { border-color: rgba(255, 210, 100, 0.6); }
+        .target-marker.elite .target-distance { top: 54px; }
+        .collection-card { cursor: pointer; }
+        .collection-card.equipped { border-color: #ffd166; box-shadow: 0 0 14px rgba(255, 209, 102, 0.4); }
+        .quest-done { border-color: rgba(255, 209, 102, 0.5); }
+        .modal-tab { font-size: 12px; padding: 12px 4px; letter-spacing: 0; }
         .target-marker.hit { animation: targetHit 0.5s ease-out forwards; pointer-events: none; }
         @keyframes targetHit {
             0% { transform: scale(1); opacity: 1; }
@@ -839,18 +853,22 @@
     <div id="inventory-modal" class="game-modal hidden">
         <div class="modal-content">
             <div class="modal-header">
-                <span>行囊</span>
+                <span>行囊 <small id="stone-count" style="color:#ffd166;font-size:12px;letter-spacing:0;margin-left:8px;">💎 0</small></span>
                 <button class="modal-close" data-close="inventory-modal">×</button>
             </div>
             <div class="modal-tabs">
                 <button class="modal-tab active" data-tab="items">物品</button>
                 <button class="modal-tab" data-tab="kiln">练妖壶</button>
                 <button class="modal-tab" data-tab="collection">图鉴</button>
+                <button class="modal-tab" data-tab="quests">任务</button>
+                <button class="modal-tab" data-tab="upgrade">修炼</button>
             </div>
             <div class="modal-body">
                 <div class="tab-panel" id="tab-items"></div>
                 <div class="tab-panel hidden" id="tab-kiln"></div>
                 <div class="tab-panel hidden" id="tab-collection"></div>
+                <div class="tab-panel hidden" id="tab-quests"></div>
+                <div class="tab-panel hidden" id="tab-upgrade"></div>
             </div>
         </div>
     </div>
@@ -917,13 +935,19 @@
             // ============================================================
             // 配置
             // ============================================================
+            const UPG = { hp: 0, dmg: 0, regen: 0 };   // 修炼等级
             const CONFIG = {
-                maxHp: 5,
+                get maxHp() { return 6 + UPG.hp; },
                 targetCount: 4,
-                targetDespawnTime: 15000,
-                enemyMinHp: 26,
-                enemyMaxHp: 42,
-                enemyAttackInterval: 2400,
+                targetDespawnTime: 40000,   // 妖邪停留更久，且遁走不再扣剑气
+                enemyMinHp: 22,
+                enemyMaxHp: 36,
+                enemyAttackInterval: 4200,  // 攻击间隔拉长
+                enemyChargeTime: 900,       // 攻击前摇（命中可打断）
+                hpRegenSeconds: 20,         // 地图上每 N 秒自动回 1 点剑气
+                defeatRestoreHp: 3,         // 力竭撤退后恢复到的剑气
+                levelDmgBonus: 0.06,        // 每级伤害加成
+                saveKey: 'yujian_save_v1',
                 defaultZoom: 17,
                 maxZoom: 19,
                 minZoom: 3,
@@ -942,8 +966,8 @@
                 gymCount: 2,
                 gymMinDist: 130,
                 gymMaxDist: 420,
-                gymHpMul: 1.8,          // 道场敌人 HP 倍数
-                gymAttackMul: 0.72,     // 道场攻击间隔倍数
+                gymHpMul: 1.6,          // 道场敌人 HP 倍数
+                gymAttackMul: 0.85,     // 道场攻击间隔倍数
                 // 掉落概率
                 dropDemonCore: 0.30,
                 dropQiPill: 0.25,
@@ -1039,6 +1063,7 @@
                 radarCollapsed: false,
                 radarTimer: null,
                 inventory: { swordCharm: 0, qiPill: 0, demonCore: 0 },
+                stones: 0, quests: [], questDate: '', companion: null, lastLevel: null, regenAcc: 0,
                 collection: [],
                 kiln: {
                     active: false,
@@ -1272,8 +1297,9 @@
                 if (!latlng) return;
 
                 const id = ++state.targetIdSeq;
+                const isElite = Math.random() < 0.15;
                 const icon = L.divIcon({
-                    className: 'target-marker',
+                    className: 'target-marker' + (isElite ? ' elite' : ''),
                     html: `<div class="target-ring"></div><div class="target-core"></div><div class="target-distance">--m</div>`,
                     iconSize: [48, 48], iconAnchor: [24, 24]
                 });
@@ -1293,16 +1319,14 @@
                     }
                 });
 
-                const targetObj = { id, latlng, marker, timeoutId: null };
+                const targetObj = { id, latlng, marker, timeoutId: null, elite: isElite };
                 targetObj.timeoutId = setTimeout(() => {
                     if (!state.targets.find(t => t.id === id)) return;
                     if (battle.active) { targetObj.timeoutId = null; return; }
                     removeTarget(id, false);
                     if (state.running) {
-                        state.hp = Math.max(0, state.hp - 1);
-                        updateHUD();
-                        statusEl.textContent = '妖邪遁走了… 剑气 -1';
-                        if (state.hp <= 0) endGame();
+                        statusEl.textContent = '一只妖邪遁走了，新的妖邪出现…';
+                        setTimeout(() => { if (state.running && !battle.active) spawnTarget(); }, 800);
                     }
                 }, CONFIG.targetDespawnTime);
 
@@ -1333,10 +1357,8 @@
                         if (battle.active) { t.timeoutId = null; return; }
                         removeTarget(t.id, false);
                         if (state.running) {
-                            state.hp = Math.max(0, state.hp - 1);
-                            updateHUD();
-                            statusEl.textContent = '妖邪遁走了… 剑气 -1';
-                            if (state.hp <= 0) endGame();
+                            statusEl.textContent = '一只妖邪遁走了，新的妖邪出现…';
+                            setTimeout(() => { if (state.running && !battle.active) spawnTarget(); }, 800);
                         }
                     }, CONFIG.targetDespawnTime);
                 }
@@ -1550,6 +1572,7 @@
                 const emoji = state.kiln.pendingEmoji;
                 const name = state.kiln.pendingName;
                 state.collection.push({ emoji, name, time: Date.now() });
+                addQuestProgress('hatch');
                 state.kiln.active = false;
                 state.kiln.startTime = 0;
                 state.kiln.pendingEmoji = null;
@@ -1571,9 +1594,9 @@
                 }
                 el.innerHTML = '<div class="collection-grid">' +
                     state.collection.map(c => `
-                        <div class="collection-card">
+                        <div class="collection-card${state.companion && state.companion.time === c.time ? ' equipped' : ''}" data-time="${c.time}">
                             <div class="collection-emoji">${c.emoji}</div>
-                            <div class="collection-name">${c.name}</div>
+                            <div class="collection-name">${c.name}${state.companion && state.companion.time === c.time ? ' ✦出战' : ''}</div>
                         </div>
                     `).join('') +
                 '</div>';
@@ -1584,9 +1607,11 @@
             // ============================================================
             btnInventory.addEventListener('click', () => {
                 if (battle.active) return;
+                ensureKilnTimer();
                 renderInventory();
                 renderKiln();
                 renderCollection();
+                renderQuests(); renderUpgrades();
                 // 默认切到物品 tab
                 document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'items'));
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
@@ -1623,6 +1648,8 @@
                     if (name === 'kiln') renderKiln();
                     if (name === 'collection') renderCollection();
                     if (name === 'items') renderInventory();
+                    if (name === 'quests') renderQuests();
+                    if (name === 'upgrade') renderUpgrades();
                 });
             });
 
@@ -1650,7 +1677,7 @@
             function updateRadar() {
                 if (!state.playerLatLng) return;
                 const list = state.targets
-                    .map(t => ({ id: t.id, dist: state.playerLatLng.distanceTo(t.latlng) }))
+                    .map(t => ({ id: t.id, elite: t.elite, dist: state.playerLatLng.distanceTo(t.latlng) }))
                     .sort((a, b) => a.dist - b.dist);
                 radarCountEl.textContent = list.length;
                 if (list.length === 0) {
@@ -1660,7 +1687,7 @@
                 radarListEl.innerHTML = list.map(item => `
                     <div class="radar-item" data-id="${item.id}">
                         <span class="radar-dot"></span>
-                        <span class="radar-name">妖邪</span>
+                        <span class="radar-name">${item.elite ? '⭐ 精英妖邪' : '妖邪'}</span>
                         <span class="radar-dist">${Math.round(item.dist)}m</span>
                     </div>
                 `).join('');
@@ -1733,11 +1760,186 @@
             // ============================================================
             // HUD
             // ============================================================
+            function saveProgress() {
+                try {
+                    localStorage.setItem(CONFIG.saveKey, JSON.stringify({
+                        score: state.score,
+                        hp: state.hp,
+                        inventory: state.inventory,
+                        collection: state.collection,
+                        kiln: state.kiln,
+                        stones: state.stones, upg: UPG, quests: state.quests,
+                        questDate: state.questDate, companion: state.companion
+                    }));
+                } catch (e) {}
+            }
+            function loadProgress() {
+                try {
+                    const raw = localStorage.getItem(CONFIG.saveKey);
+                    if (!raw) return false;
+                    const d = JSON.parse(raw);
+                    state.score = d.score | 0;
+                    Object.assign(UPG, { hp: 0, dmg: 0, regen: 0 }, d.upg || {});
+                    state.stones = d.stones | 0;
+                    state.quests = Array.isArray(d.quests) ? d.quests : [];
+                    state.questDate = d.questDate || '';
+                    state.companion = d.companion || null;
+                    state.hp = Math.min(CONFIG.maxHp, Math.max(1, d.hp | 0 || CONFIG.maxHp));
+                    state.inventory = Object.assign({ swordCharm: 0, qiPill: 0, demonCore: 0 }, d.inventory || {});
+                    state.collection = Array.isArray(d.collection) ? d.collection : [];
+                    if (d.kiln && d.kiln.active) state.kiln = d.kiln;
+                    return true;
+                } catch (e) { return false; }
+            }
+            // ---------- 任务 ----------
+            const QUEST_POOL = [
+                { type: 'elite', desc: '击败 1 只精英妖邪', goal: 1, stones: 10, item: 'qiPill' },
+                { type: 'gym',   desc: '攻占 / 挑战道场 1 次', goal: 1, stones: 8, item: 'swordCharm' },
+                { type: 'hatch', desc: '用练妖壶孵化 1 只妖怪', goal: 1, stones: 8, item: null },
+                { type: 'kill',  desc: '斩杀 10 只妖邪', goal: 10, stones: 12, item: 'demonCore' }
+            ];
+            function ensureQuests() {
+                const today = new Date().toDateString();
+                if (state.quests.length && state.questDate === today) return;
+                const kill = { type: 'kill', desc: '斩杀 5 只妖邪', goal: 5, stones: 6, item: null };
+                const others = QUEST_POOL.slice().sort(() => Math.random() - 0.5).slice(0, 2);
+                state.quests = [kill, ...others].map(q => Object.assign({ progress: 0, claimed: false }, q));
+                state.questDate = today;
+            }
+            function addQuestProgress(type) {
+                let changed = false;
+                for (const q of state.quests) {
+                    if (q.type === type && q.progress < q.goal) {
+                        q.progress++;
+                        changed = true;
+                        if (q.progress >= q.goal) addToast('任务完成：' + q.desc);
+                    }
+                }
+                if (changed) saveProgress();
+            }
+            function renderQuests() {
+                ensureQuests();
+                const el = document.getElementById('tab-quests');
+                el.innerHTML = '<div class="kiln-hint" style="text-align:center;margin-bottom:12px;">每日任务 · 次日自动刷新</div>' +
+                    state.quests.map((q, i) => {
+                        const done = q.progress >= q.goal;
+                        const reward = `💎${q.stones}` + (q.item ? ' + ' + ITEM_DEFS[q.item].icon + ITEM_DEFS[q.item].name : '');
+                        const btn = q.claimed
+                            ? '<span style="font-size:11px;color:#6a8aaf;padding:0 6px;">已领取</span>'
+                            : `<button class="item-use-btn" data-claim="${i}" ${done ? '' : 'disabled'}>领取</button>`;
+                        return `
+                            <div class="item-card ${done && !q.claimed ? 'quest-done' : ''}">
+                                <div class="item-icon">📜</div>
+                                <div class="item-info">
+                                    <div class="item-name">${q.desc}</div>
+                                    <div class="item-desc">进度 ${Math.min(q.progress, q.goal)} / ${q.goal} · 奖励 ${reward}</div>
+                                </div>
+                                ${btn}
+                            </div>`;
+                    }).join('');
+            }
+            function claimQuest(i) {
+                const q = state.quests[i];
+                if (!q || q.claimed || q.progress < q.goal) return;
+                q.claimed = true;
+                state.stones += q.stones;
+                if (q.item) state.inventory[q.item]++;
+                addToast(`领取奖励：灵石 +${q.stones}`);
+                updateInventoryBadge();
+                updateHUD();
+                renderQuests();
+            }
+
+            // ---------- 修炼 ----------
+            const UPG_DEFS = [
+                { key: 'hp',    icon: '❤️', name: '剑气上限', desc: '最大剑气 +1', max: 5, cost: l => 8 + l * 6 },
+                { key: 'dmg',   icon: '⚔️', name: '剑意',     desc: '飞剑伤害 +8%', max: 8, cost: l => 6 + l * 5 },
+                { key: 'regen', icon: '🌿', name: '调息',     desc: '地图上剑气恢复更快', max: 5, cost: l => 6 + l * 5 }
+            ];
+            function renderUpgrades() {
+                const el = document.getElementById('tab-upgrade');
+                el.innerHTML = `<div class="kiln-hint" style="text-align:center;margin-bottom:12px;color:#ffd166;font-weight:700;">灵石：💎 ${state.stones}</div>` +
+                    UPG_DEFS.map(u => {
+                        const lv = UPG[u.key];
+                        const maxed = lv >= u.max;
+                        const cost = u.cost(lv);
+                        const btn = maxed
+                            ? '<span style="font-size:11px;color:#6a8aaf;padding:0 6px;">已满</span>'
+                            : `<button class="item-use-btn" data-upg="${u.key}" ${state.stones >= cost ? '' : 'disabled'}>💎${cost}</button>`;
+                        return `
+                            <div class="item-card">
+                                <div class="item-icon">${u.icon}</div>
+                                <div class="item-info">
+                                    <div class="item-name">${u.name} <span style="color:#ffd166;font-size:12px;">Lv.${lv}/${u.max}</span></div>
+                                    <div class="item-desc">${u.desc}</div>
+                                </div>
+                                ${btn}
+                            </div>`;
+                    }).join('') +
+                    '<div class="kiln-hint" style="text-align:center;margin-top:8px;">击败妖邪、完成任务、攻占道场可获得灵石</div>';
+            }
+            function buyUpgrade(key) {
+                const u = UPG_DEFS.find(x => x.key === key);
+                if (!u || UPG[key] >= u.max) return;
+                const cost = u.cost(UPG[key]);
+                if (state.stones < cost) { addToast('灵石不足'); return; }
+                state.stones -= cost;
+                UPG[key]++;
+                if (key === 'hp') state.hp = Math.min(CONFIG.maxHp, state.hp + 1);
+                addToast(`${u.name} 提升至 Lv.${UPG[key]}`);
+                updateHUD();
+                renderUpgrades();
+            }
+
+            // ---------- 妖宠出战 ----------
+            function updateAvatar() {
+                const av = document.querySelector('#player-hud .avatar');
+                if (av) av.textContent = state.companion ? state.companion.emoji : '🗡️';
+            }
+            inventoryModal.addEventListener('click', (e) => {
+                const claim = e.target.closest('[data-claim]');
+                if (claim) { claimQuest(parseInt(claim.dataset.claim, 10)); return; }
+                const upg = e.target.closest('[data-upg]');
+                if (upg) { buyUpgrade(upg.dataset.upg); return; }
+                const card = e.target.closest('.collection-card');
+                if (card) {
+                    const time = parseInt(card.dataset.time, 10);
+                    const c = state.collection.find(x => x.time === time);
+                    if (!c) return;
+                    if (state.companion && state.companion.time === time) {
+                        state.companion = null;
+                        addToast('妖宠已收回');
+                    } else {
+                        state.companion = c;
+                        addToast(`${c.name} 出战！伤害 +12%`);
+                    }
+                    updateAvatar();
+                    saveProgress();
+                    renderCollection();
+                }
+            });
+
+            function ensureKilnTimer() {
+                if (!state.kiln.active || kilnTimer) return;
+                kilnTimer = setInterval(() => {
+                    if (!inventoryModal.classList.contains('hidden') &&
+                        !document.getElementById('tab-kiln').classList.contains('hidden')) {
+                        renderKiln();
+                    }
+                    if (!state.kiln.active) { clearInterval(kilnTimer); kilnTimer = null; }
+                }, 500);
+            }
+
             function updateHUD() {
+                saveProgress();
                 scoreEl.textContent = state.score;
                 hpEl.textContent = state.hp;
                 const level = Math.floor(state.score / CONFIG.expPerLevel) + 1;
                 const progress = (state.score % CONFIG.expPerLevel) / CONFIG.expPerLevel;
+                if (state.lastLevel !== null && level > state.lastLevel) addToast(`升级！Lv.${level} · 伤害提升`);
+                state.lastLevel = level;
+                const sc = document.getElementById('stone-count');
+                if (sc) sc.textContent = '💎 ' + state.stones;
                 levelEl.textContent = level;
                 expFillEl.style.width = (progress * 100) + '%';
             }
@@ -1763,6 +1965,7 @@
                 battle.gym = mode === 'gym' ? gymObj : null;
                 battle.target = mode === 'normal' ? targetData : null;
                 battle.resolveLock = false;
+                battle.charging = false;
                 battle.dying = false;
                 battle.dyingT = 0;
                 battle.victoryHandled = false;
@@ -1776,7 +1979,10 @@
                 battle.enemyName = (mode === 'gym' ? gymObj.enemyName : template.name);
                 battle.enemyEmoji = (mode === 'gym' ? gymObj.enemyEmoji : template.emoji);
                 const baseHp = CONFIG.enemyMinHp + Math.floor(Math.random() * (CONFIG.enemyMaxHp - CONFIG.enemyMinHp + 1));
-                battle.enemyMaxHp = mode === 'gym' ? Math.floor(baseHp * CONFIG.gymHpMul) : baseHp;
+                battle.elite = mode === 'normal' && !!targetData.elite;
+                battle.enemyMaxHp = mode === 'gym' ? Math.floor(baseHp * CONFIG.gymHpMul)
+                                  : (battle.elite ? Math.floor(baseHp * 1.7) : baseHp);
+                if (battle.elite) battle.enemyName = '精英·' + battle.enemyName;
                 battle.enemyHp = battle.enemyMaxHp;
                 battle.attackInterval = mode === 'gym'
                     ? Math.floor(CONFIG.enemyAttackInterval * CONFIG.gymAttackMul)
@@ -1814,12 +2020,23 @@
                 }, mode === 'gym' ? 1800 : 2200);
             }
 
+            const DEFAULT_HINT = '向上滑动手指，甩出飞剑！';
             function scheduleEnemyAttack() {
                 if (battle.attackTimer) clearTimeout(battle.attackTimer);
                 battle.attackTimer = setTimeout(() => {
-                    if (!battle.active) return;
-                    enemyAttack();
-                    if (battle.active) scheduleEnemyAttack();
+                    if (!battle.active || battle.resolveLock) return;
+                    // 前摇：妖邪蓄力，期间命中可打断
+                    battle.charging = true;
+                    battleHintEl.textContent = '⚠ 妖邪蓄力中！命中可打断';
+                    addBattleLog(`${battle.enemyName} 正在蓄力…`);
+                    battle.attackTimer = setTimeout(() => {
+                        if (!battle.active || battle.resolveLock) return;
+                        const stillCharging = battle.charging;
+                        battle.charging = false;
+                        battleHintEl.textContent = DEFAULT_HINT;
+                        if (stillCharging) enemyAttack();
+                        if (battle.active && !battle.resolveLock) scheduleEnemyAttack();
+                    }, CONFIG.enemyChargeTime);
                 }, battle.attackInterval);
             }
 
@@ -1886,7 +2103,7 @@
                     if (!s.hit && !battle.dying && battle.enemyHp > 0) {
                         const dx = s.x - battle.enemyX;
                         const dy = s.y - battle.enemyY;
-                        const r = battle.enemySize * 0.58;
+                        const r = battle.enemySize * 0.85;
                         if (dx * dx + dy * dy < r * r) {
                             s.hit = true;
                             onSwordHit();
@@ -1938,6 +2155,13 @@
                 bctx.beginPath();
                 bctx.arc(0, 0, glowR, 0, Math.PI * 2);
                 bctx.fill();
+                if (battle.charging) {
+                    bctx.strokeStyle = 'rgba(255, 70, 70, 0.9)';
+                    bctx.lineWidth = 4;
+                    bctx.beginPath();
+                    bctx.arc(0, 0, glowR * (0.7 + 0.1 * Math.sin(ts / 80)), 0, Math.PI * 2);
+                    bctx.stroke();
+                }
                 bctx.scale(scale, scale);
                 if (battle.hurtFlash > 0) {
                     bctx.filter = `brightness(${1 + battle.hurtFlash * 2.2}) drop-shadow(0 0 30px rgba(255,255,220,0.9))`;
@@ -2087,18 +2311,27 @@
             // ============================================================
             function onSwordHit() {
                 if (battle.dying || battle.resolveLock) return;
-                const baseDmg = 8 + Math.floor(Math.random() * 7);
-                const dmg = Math.round(baseDmg * battle.damageBonus);
+                const baseDmg = 9 + Math.floor(Math.random() * 7);
+                const level = Math.floor(state.score / CONFIG.expPerLevel) + 1;
+                const lvMul = (1 + (level - 1) * CONFIG.levelDmgBonus) * (1 + UPG.dmg * 0.08) * (state.companion ? 1.12 : 1);
+                const dmg = Math.round(baseDmg * battle.damageBonus * lvMul);
                 battle.enemyHp = Math.max(0, battle.enemyHp - dmg);
                 battle.hurtFlash = 1;
                 updateBattleHUD();
                 addBattleLog(`飞剑命中！造成 ${dmg} 点伤害`);
+                if (battle.charging) {
+                    battle.charging = false;
+                    battleHintEl.textContent = DEFAULT_HINT;
+                    addBattleLog('✦ 成功打断妖邪蓄力！');
+                }
                 if (battle.enemyHp <= 0) winBattle();
             }
 
             function winBattle() {
                 if (battle.resolveLock) return;
                 battle.resolveLock = true;
+                battle.charging = false;
+                battleHintEl.textContent = DEFAULT_HINT;
                 battle.dying = true;
                 battle.dyingT = 0;
                 if (battle.attackTimer) { clearTimeout(battle.attackTimer); battle.attackTimer = null; }
@@ -2110,17 +2343,28 @@
                 if (battle.resolveLock) return;
                 battle.resolveLock = true;
                 if (battle.attackTimer) { clearTimeout(battle.attackTimer); battle.attackTimer = null; }
-                addBattleLog('剑气耗尽…');
+                battle.charging = false;
+                addBattleLog('剑气耗尽，力竭撤退…');
                 setTimeout(() => {
                     closeBattleOverlay();
-                    endGame();
+                    onDefeatRetreat();
                 }, 1100);
+            }
+
+            // 战败不再「游戏结束」：保留进度，撤退并恢复部分剑气
+            function onDefeatRetreat() {
+                state.hp = Math.min(CONFIG.maxHp, Math.max(state.hp, CONFIG.defeatRestoreHp));
+                updateHUD();
+                resumeTargetTimeouts();
+                statusEl.textContent = '力竭撤退，运功调息后可再战';
+                addToast(`力竭撤退，剑气恢复至 ${state.hp}`);
             }
 
             function finishBattleVictory() {
                 const mode = battle.mode;
                 const targetId = battle.target ? battle.target.id : null;
                 const gym = battle.gym;
+                const wasElite = !!battle.elite;
 
                 closeBattleOverlay();
 
@@ -2134,13 +2378,21 @@
                     updateInventoryBadge();
 
                     state.score += 2;
+                    state.stones += 10;
+                    addQuestProgress('gym');
+                    addQuestProgress('kill');
                     updateHUD();
                     resumeTargetTimeouts();
                     statusEl.textContent = '道场攻占成功！获得妖丹×2 飞剑符×1';
                     addToast(`攻占 ${gym.name}！妖丹×2 飞剑符×1`);
                 } else {
                     if (targetId !== null) removeTarget(targetId, true);
-                    state.score++;
+                    state.score += wasElite ? 2 : 1;
+                    const gain = wasElite ? 5 + Math.floor(Math.random() * 4) : 1 + Math.floor(Math.random() * 3);
+                    state.stones += gain;
+                    addToast(`灵石 +${gain}${wasElite ? '（精英）' : ''}`);
+                    addQuestProgress('kill');
+                    if (wasElite) { addQuestProgress('elite'); state.inventory.demonCore++; updateInventoryBadge(); }
 
                     // 随机掉落
                     const roll = Math.random();
@@ -2179,6 +2431,8 @@
                 battle.aiming = false;
                 battle.aimPointerId = null;
                 battle.damageBonus = 1;
+                battle.charging = false;
+                if (battle.attackTimer) { clearTimeout(battle.attackTimer); battle.attackTimer = null; }
                 stopBattleLoop();
                 battleOverlay.classList.add('hidden');
                 battleHintEl.textContent = '向上滑动手指，甩出飞剑！';
@@ -2218,6 +2472,13 @@
                 state.collection = [];
                 state.kiln = { active: false, startTime: 0, pendingEmoji: null, pendingName: null };
                 if (kilnTimer) { clearInterval(kilnTimer); kilnTimer = null; }
+                state.stones = 0; state.companion = null; state.quests = []; state.questDate = '';
+                state.lastLevel = null; state.regenAcc = 0;
+                Object.assign(UPG, { hp: 0, dmg: 0, regen: 0 });
+                const restored = loadProgress();   // 读取上次存档，进度不再丢失
+                ensureQuests();
+                updateAvatar();
+                ensureKilnTimer();
                 updateInventoryBadge();
 
                 for (const t of state.targets) {
@@ -2247,6 +2508,19 @@
                 for (let i = 0; i < CONFIG.targetCount; i++) {
                     setTimeout(() => { if (state.running) spawnTarget(); }, i * 400);
                 }
+
+                // 剑气自然恢复（战斗外）
+                if (state.regenTimer) clearInterval(state.regenTimer);
+                state.regenTimer = setInterval(() => {
+                    if (state.running && !battle.active && state.hp < CONFIG.maxHp &&
+                        (state.regenAcc = (state.regenAcc || 0) + 1) >= Math.max(6, CONFIG.hpRegenSeconds - UPG.regen * 3) &&
+                        !(state.regenAcc = 0)) {
+                        state.hp++;
+                        updateHUD();
+                        addToast('调息运功，剑气 +1');
+                    }
+                }, 1000);
+                if (restored) addToast(`已读取存档 · Lv.${Math.floor(state.score / CONFIG.expPerLevel) + 1}`);
 
                 if (state.radarTimer) clearInterval(state.radarTimer);
                 state.radarTimer = setInterval(() => {
@@ -2286,6 +2560,10 @@
                 if (state.radarTimer) {
                     clearInterval(state.radarTimer);
                     state.radarTimer = null;
+                }
+                if (state.regenTimer) {
+                    clearInterval(state.regenTimer);
+                    state.regenTimer = null;
                 }
             }
 
