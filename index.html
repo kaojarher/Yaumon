@@ -258,6 +258,14 @@
         .target-marker.shiny .spr { filter: hue-rotate(70deg) saturate(1.5) drop-shadow(0 0 5px #ffe08a); }
         .egg-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 8px; border-radius: 12px; background: rgba(255,209,102,0.06); border: 1px solid rgba(255,209,102,0.18); }
         .egg-ico { font-size: 26px; }
+        #btn-raid-leave { position: absolute; right: 14px; z-index: 4; top: calc(190px + env(safe-area-inset-top, 0px)); padding: 6px 14px; border-radius: 16px; cursor: pointer; background: rgba(60, 14, 20, 0.85); color: #ffb0b8; border: 1px solid rgba(255,100,120,0.4); font-size: 12px; font-weight: 700; }
+        .map-btn.alert { box-shadow: 0 0 0 2px #ff6b7a, 0 0 12px rgba(255,107,122,0.8); }
+        .room-input { width: 100%; box-sizing: border-box; margin: 4px 0; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(100,180,255,0.3); background: rgba(10,14,22,0.9); color: #e8f2ff; font-size: 14px; }
+        .room-peer { display: flex; align-items: center; gap: 8px; padding: 8px 10px; margin-bottom: 6px; border-radius: 10px; background: rgba(100,180,255,0.06); border: 1px solid rgba(100,180,255,0.15); font-size: 13px; color: #d8e8ff; }
+        .room-peer .item-use-btn { margin-left: auto; }
+        .tower-slot { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 12px; color: #a8c8e8; }
+        .tower-slot .item-use-btn { margin-left: auto; }
+        .tower-mode .collection-card { outline: 1px dashed rgba(255,143,232,0.6); }
         .egg-info { flex: 1; min-width: 0; font-size: 12px; color: #a8c8e8; }
         .egg-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); margin-top: 5px; overflow: hidden; }
         .egg-bar > i { display: block; height: 100%; background: linear-gradient(90deg, #ffd166, #ff9f43); }
@@ -897,6 +905,7 @@
             <span class="compass-arrow" id="compass-arrow">▲</span>
         </button>
         <button class="map-btn" id="btn-locate" aria-label="回到當前位置">📍</button>
+        <button class="map-btn" id="btn-room" aria-label="房間">🤝</button>
         <button class="map-btn" id="btn-zoom-in" aria-label="放大">+</button>
         <button class="map-btn" id="btn-zoom-out" aria-label="縮小">−</button>
     </div>
@@ -930,6 +939,7 @@
         </div>
         <canvas id="battle-canvas"></canvas>
         <button id="btn-ar-toggle" type="button">AR 關</button>
+        <button id="btn-raid-leave" type="button" style="display:none;">離開戰鬥</button>
         <div id="hit-flash"></div>
 
         <div class="battle-top">
@@ -1045,6 +1055,16 @@
         </div>
     </div>
 
+    <div id="room-modal" class="game-modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🤝 房間</span>
+                <button class="modal-close" data-close="room-modal">×</button>
+            </div>
+            <div class="modal-body" id="room-body"></div>
+        </div>
+    </div>
+
     <!-- 遊戲結束遮罩 -->
     <div class="overlay hidden" id="gameover-overlay">
         <h1>劍意消散</h1>
@@ -1083,6 +1103,10 @@
             for (const L of Object.keys(FUSE_I18N2)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N2[L]); }
             const FUSE_I18N3 = {"en": {"妖卵": "Egg", "妖卵×{1}": "Egg ×{1}", "妖卵 {1}/{2} · 步行或斬妖可累積孵化進度": "Eggs {1}/{2} · Walk or slay monsters to hatch them", "{1} 公尺妖卵": "{1} m Egg", "{1} / {2} 公尺": "{1} / {2} m", "沒有妖卵。靈泉補給、擊敗妖王或每日登入大獎都有機會獲得。": "No eggs. Get them from springs, bosses or the 7-day login prize.", "妖卵孵化了！獲得 {1}": "An egg hatched! Got {1}", "獲得一顆妖卵（{1} 公尺）": "Got an egg ({1} m)", "妖卵欄已滿，沒有獲得妖卵": "Egg slots full — no egg received", "勳章": "Medals", "斬妖人": "Slayer", "累計斬殺妖邪": "Total monsters slain", "行者": "Wanderer", "累計步行（公里）": "Total distance walked (km)", "泉水巡禮": "Spring Pilgrim", "使用靈泉補給": "Springs used", "合成師": "Fusion Adept", "合成妖怪次數": "Monsters fused", "孵化師": "Egg Hatcher", "孵化妖卵": "Eggs hatched", "妖怪學者": "Monster Scholar", "圖鑑收錄種類": "Species in the dex", "道場霸主": "Dojo Master", "攻佔道場": "Dojos conquered", "閃光獵人": "Shiny Hunter", "收服閃光妖": "Shiny monsters caught", "未獲得": "Locked", "銅章": "Bronze", "銀章": "Silver", "金章": "Gold", "勳章進度 {1} / {2}": "Progress {1} / {2}", "已達最高等級": "Max tier reached", "勳章：{1} {2}，靈石 +{3}": "Medal: {1} {2}, Spirit Stones +{3}", "連續登入 {1} 天（第 7 天有大獎）": "Login streak: {1} days (big prize on day 7)", "每日登入第 {1} 天：靈石 +{2}": "Daily login day {1}: Spirit Stones +{2}", "七日大獎：妖丹×2、引妖香×1": "7-day prize: Demon Core ×2, Lure Incense ×1", "絕佳一擊！造成 {1} 點傷害": "Excellent hit! {1} damage", "精準一擊！造成 {1} 點傷害": "Great hit! {1} damage", "閃光": "Shiny", "✦ 發現閃光妖！": "✦ A shiny monster appeared!"}, "fr": {"妖卵": "Œuf", "妖卵×{1}": "Œuf ×{1}", "妖卵 {1}/{2} · 步行或斬妖可累積孵化進度": "Œufs {1}/{2} · Marchez ou terrassez des monstres pour les faire éclore", "{1} 公尺妖卵": "Œuf {1} m", "{1} / {2} 公尺": "{1} / {2} m", "沒有妖卵。靈泉補給、擊敗妖王或每日登入大獎都有機會獲得。": "Aucun œuf. Obtenez-en aux sources, sur les boss ou avec la récompense des 7 jours.", "妖卵孵化了！獲得 {1}": "Un œuf a éclos ! Vous obtenez {1}", "獲得一顆妖卵（{1} 公尺）": "Vous obtenez un œuf ({1} m)", "妖卵欄已滿，沒有獲得妖卵": "Emplacements d’œufs pleins — aucun œuf reçu", "勳章": "Médailles", "斬妖人": "Pourfendeur", "累計斬殺妖邪": "Monstres terrassés au total", "行者": "Marcheur", "累計步行（公里）": "Distance totale marchée (km)", "泉水巡禮": "Pèlerin des sources", "使用靈泉補給": "Sources utilisées", "合成師": "Adepte de fusion", "合成妖怪次數": "Fusions réalisées", "孵化師": "Éleveur d’œufs", "孵化妖卵": "Œufs éclos", "妖怪學者": "Érudit des monstres", "圖鑑收錄種類": "Espèces au bestiaire", "道場霸主": "Maître de dojo", "攻佔道場": "Dojos conquis", "閃光獵人": "Chasseur de chromatiques", "收服閃光妖": "Monstres chromatiques capturés", "未獲得": "Verrouillé", "銅章": "Bronze", "銀章": "Argent", "金章": "Or", "勳章進度 {1} / {2}": "Progression {1} / {2}", "已達最高等級": "Rang maximum atteint", "勳章：{1} {2}，靈石 +{3}": "Médaille : {1} {2}, pierres spirituelles +{3}", "連續登入 {1} 天（第 7 天有大獎）": "Série de connexion : {1} jours (gros lot au 7e jour)", "每日登入第 {1} 天：靈石 +{2}": "Connexion quotidienne, jour {1} : pierres spirituelles +{2}", "七日大獎：妖丹×2、引妖香×1": "Lot des 7 jours : Noyau démoniaque ×2, Encens d’appât ×1", "絕佳一擊！造成 {1} 點傷害": "Coup excellent ! {1} dégâts", "精準一擊！造成 {1} 點傷害": "Beau coup ! {1} dégâts", "閃光": "Chromatique", "✦ 發現閃光妖！": "✦ Un monstre chromatique est apparu !"}, "zh-CN": {"妖卵": "妖卵", "妖卵×{1}": "妖卵×{1}", "妖卵 {1}/{2} · 步行或斬妖可累積孵化進度": "妖卵 {1}/{2} · 步行或斩妖可累积孵化进度", "{1} 公尺妖卵": "{1} 米妖卵", "{1} / {2} 公尺": "{1} / {2} 米", "沒有妖卵。靈泉補給、擊敗妖王或每日登入大獎都有機會獲得。": "没有妖卵。灵泉补给、击败妖王或每日登入大奖都有机会获得。", "妖卵孵化了！獲得 {1}": "妖卵孵化了！获得 {1}", "獲得一顆妖卵（{1} 公尺）": "获得一颗妖卵（{1} 米）", "妖卵欄已滿，沒有獲得妖卵": "妖卵栏已满，没有获得妖卵", "勳章": "勋章", "斬妖人": "斩妖人", "累計斬殺妖邪": "累计斩杀妖邪", "行者": "行者", "累計步行（公里）": "累计步行（公里）", "泉水巡禮": "泉水巡礼", "使用靈泉補給": "使用灵泉补给", "合成師": "合成师", "合成妖怪次數": "合成妖怪次数", "孵化師": "孵化师", "孵化妖卵": "孵化妖卵", "妖怪學者": "妖怪学者", "圖鑑收錄種類": "图鉴收录种类", "道場霸主": "道场霸主", "攻佔道場": "攻占道场", "閃光獵人": "闪光猎人", "收服閃光妖": "收服闪光妖", "未獲得": "未获得", "銅章": "铜章", "銀章": "银章", "金章": "金章", "勳章進度 {1} / {2}": "勋章进度 {1} / {2}", "已達最高等級": "已达最高等级", "勳章：{1} {2}，靈石 +{3}": "勋章：{1} {2}，灵石 +{3}", "連續登入 {1} 天（第 7 天有大獎）": "连续登入 {1} 天（第 7 天有大奖）", "每日登入第 {1} 天：靈石 +{2}": "每日登入第 {1} 天：灵石 +{2}", "七日大獎：妖丹×2、引妖香×1": "七日大奖：妖丹×2、引妖香×1", "絕佳一擊！造成 {1} 點傷害": "绝佳一击！造成 {1} 点伤害", "精準一擊！造成 {1} 點傷害": "精准一击！造成 {1} 点伤害", "閃光": "闪光", "✦ 發現閃光妖！": "✦ 发现闪光妖！"}};
             for (const L of Object.keys(FUSE_I18N3)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N3[L]); }
+            const FUSE_I18N4 = {"en": {"煉妖塔": "Demon Tower", "煉妖塔 Lv.{1} · 容量 {2}/{3}": "Demon Tower Lv.{1} · Slots {2}/{3}", "將多餘的妖怪送入塔中煉化，換取妖丹與靈石；煉化越多，塔越高、容量越大。": "Send spare monsters to the tower to refine them into Demon Cores and Spirit Stones. The more you refine, the taller the tower and the more slots it has.", "送入煉妖塔": "Send to Tower", "結束送入模式": "Stop Sending", "點選下方妖怪，即可送入煉妖塔": "Tap a monster below to send it to the tower", "煉化中 · 剩 {1} 秒": "Refining · {1} s left", "領取煉化": "Collect", "空位": "Empty slot", "確定將 {1} 送入煉妖塔？妖怪會被煉化消失。": "Send {1} to the Demon Tower? The monster will be consumed.", "{1} 已送入煉妖塔": "{1} sent to the Demon Tower", "煉妖塔已滿，請先領取或等待煉化完成": "The tower is full — collect or wait for refining to finish", "請先收回出戰的妖寵": "Recall your active companion first", "煉化完成：妖丹 +{1}，靈石 +{2}": "Refined: Demon Cores +{1}, Spirit Stones +{2}", "煉妖塔升到 Lv.{1}！容量 {2}": "Demon Tower reached Lv.{1}! Slots: {2}", "煉妖塔主": "Tower Keeper", "煉化妖怪": "Monsters refined"}, "fr": {"煉妖塔": "Tour des démons", "煉妖塔 Lv.{1} · 容量 {2}/{3}": "Tour des démons niv. {1} · Emplacements {2}/{3}", "將多餘的妖怪送入塔中煉化，換取妖丹與靈石；煉化越多，塔越高、容量越大。": "Envoyez vos monstres en trop à la tour pour les raffiner en noyaux démoniaques et pierres spirituelles. Plus vous raffinez, plus la tour grandit et offre d’emplacements.", "送入煉妖塔": "Envoyer à la tour", "結束送入模式": "Arrêter l’envoi", "點選下方妖怪，即可送入煉妖塔": "Touchez un monstre ci-dessous pour l’envoyer à la tour", "煉化中 · 剩 {1} 秒": "Raffinage · {1} s restantes", "領取煉化": "Récupérer", "空位": "Emplacement vide", "確定將 {1} 送入煉妖塔？妖怪會被煉化消失。": "Envoyer {1} à la tour des démons ? Le monstre sera consommé.", "{1} 已送入煉妖塔": "{1} envoyé à la tour des démons", "煉妖塔已滿，請先領取或等待煉化完成": "La tour est pleine — récupérez ou attendez la fin du raffinage", "請先收回出戰的妖寵": "Rappelez d’abord votre compagnon actif", "煉化完成：妖丹 +{1}，靈石 +{2}": "Raffiné : noyaux démoniaques +{1}, pierres spirituelles +{2}", "煉妖塔升到 Lv.{1}！容量 {2}": "La tour des démons passe au niv. {1} ! Emplacements : {2}", "煉妖塔主": "Gardien de la tour", "煉化妖怪": "Monstres raffinés"}, "zh-CN": {"煉妖塔": "炼妖塔", "煉妖塔 Lv.{1} · 容量 {2}/{3}": "炼妖塔 Lv.{1} · 容量 {2}/{3}", "將多餘的妖怪送入塔中煉化，換取妖丹與靈石；煉化越多，塔越高、容量越大。": "将多余的妖怪送入塔中炼化，换取妖丹与灵石；炼化越多，塔越高、容量越大。", "送入煉妖塔": "送入炼妖塔", "結束送入模式": "结束送入模式", "點選下方妖怪，即可送入煉妖塔": "点选下方妖怪，即可送入炼妖塔", "煉化中 · 剩 {1} 秒": "炼化中 · 剩 {1} 秒", "領取煉化": "领取炼化", "空位": "空位", "確定將 {1} 送入煉妖塔？妖怪會被煉化消失。": "确定将 {1} 送入炼妖塔？妖怪会被炼化消失。", "{1} 已送入煉妖塔": "{1} 已送入炼妖塔", "煉妖塔已滿，請先領取或等待煉化完成": "炼妖塔已满，请先领取或等待炼化完成", "請先收回出戰的妖寵": "请先收回出战的妖宠", "煉化完成：妖丹 +{1}，靈石 +{2}": "炼化完成：妖丹 +{1}，灵石 +{2}", "煉妖塔升到 Lv.{1}！容量 {2}": "炼妖塔升到 Lv.{1}！容量 {2}", "煉妖塔主": "炼妖塔主", "煉化妖怪": "炼化妖怪"}};
+            for (const L of Object.keys(FUSE_I18N4)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N4[L]); }
+            const FUSE_I18N5 = {"en": {"房間": "Room", "輸入房間名稱，與朋友（最多 8 人）一起交換妖怪、討伐妖王。房間名稱相同的人會連到一起。": "Enter a room name to trade monsters and fight bosses with friends (up to 8). Everyone using the same room name is connected together.", "你的暱稱": "Your nickname", "房間名稱": "Room name", "加入房間": "Join Room", "離開房間": "Leave Room", "連線中…": "Connecting…", "房間 {1} · 成員 {2}/8": "Room {1} · Members {2}/8", "連線方式：點對點（WebRTC）": "Connection: peer-to-peer (WebRTC)", "連線方式：同裝置分頁（無法載入連線元件）": "Connection: same-device tabs only (network component failed to load)", "等待其他人加入…（把房間名稱告訴朋友）": "Waiting for others… (share the room name with friends)", "我": "Me", "交換": "Trade", "妖王討伐": "Boss Raid", "發起妖王討伐": "Start Boss Raid", "加入討伐": "Join Raid", "討伐進度 {1} / {2}": "Boss HP {1} / {2}", "我的傷害：{1}": "My damage: {1}", "目前沒有討伐。任何成員都能發起，全員傷害累計，打倒妖王大家都有獎勵。": "No raid right now. Anyone can start one; everyone’s damage adds up, and all contributors get rewards when the boss falls.", "{1} 發起了妖王討伐！到房間加入": "{1} started a boss raid! Join from the Room menu", "團戰勝利！靈石 +{1}，妖丹 +{2}，引妖香 +1": "Raid won! Spirit Stones +{1}, Demon Cores +{2}, Lure Incense +1", "✦ 全隊最高傷害，額外獎勵！": "✦ Top damage in the party — bonus reward!", "討伐成功，但你沒有出力，沒有獎勵": "The boss fell, but you dealt no damage — no reward", "討伐已結束": "The raid has ended", "離開戰鬥": "Leave Battle", "與 {1} 交換妖怪": "Trade monsters with {1}", "我提供": "Your offer", "對方提供": "Their offer", "尚未提供": "Nothing yet", "選擇要提供的妖怪（出戰中的妖寵不能交換）": "Pick a monster to offer (your active companion can’t be traded)", "確認交換": "Confirm Trade", "已確認，等待對方…": "Confirmed — waiting for them…", "取消交換": "Cancel Trade", "對方已確認": "They confirmed", "交換成功！獲得 {1}": "Trade complete! You got {1}", "{1} 向你提出交換": "{1} offered a trade", "{1} 取消了交換": "{1} cancelled the trade", "交換失敗：妖怪已不存在": "Trade failed: the monster no longer exists", "{1} 加入了房間": "{1} joined the room", "{1} 離開了房間": "{1} left the room", "請輸入房間名稱": "Please enter a room name", "已加入房間 {1}": "Joined room {1}", "無法載入連線元件，已改為同裝置分頁模式": "Couldn’t load the network component — using same-device tab mode", "房間已滿（最多 8 人）": "The room is full (8 players max)", "團戰勇士": "Raider", "參與妖王討伐並勝利": "Raids won"}, "fr": {"房間": "Salon", "輸入房間名稱，與朋友（最多 8 人）一起交換妖怪、討伐妖王。房間名稱相同的人會連到一起。": "Saisissez un nom de salon pour échanger des monstres et affronter des boss avec vos amis (8 max). Tous ceux qui utilisent le même nom sont connectés.", "你的暱稱": "Votre pseudo", "房間名稱": "Nom du salon", "加入房間": "Rejoindre", "離開房間": "Quitter le salon", "連線中…": "Connexion…", "房間 {1} · 成員 {2}/8": "Salon {1} · Membres {2}/8", "連線方式：點對點（WebRTC）": "Connexion : pair à pair (WebRTC)", "連線方式：同裝置分頁（無法載入連線元件）": "Connexion : onglets du même appareil (composant réseau indisponible)", "等待其他人加入…（把房間名稱告訴朋友）": "En attente d’autres joueurs… (donnez le nom du salon à vos amis)", "我": "Moi", "交換": "Échanger", "妖王討伐": "Raid de boss", "發起妖王討伐": "Lancer un raid", "加入討伐": "Rejoindre le raid", "討伐進度 {1} / {2}": "PV du boss {1} / {2}", "我的傷害：{1}": "Mes dégâts : {1}", "目前沒有討伐。任何成員都能發起，全員傷害累計，打倒妖王大家都有獎勵。": "Aucun raid en cours. N’importe qui peut en lancer un ; les dégâts de tous s’additionnent et chacun est récompensé à la chute du boss.", "{1} 發起了妖王討伐！到房間加入": "{1} a lancé un raid de boss ! Rejoignez depuis le menu Salon", "團戰勝利！靈石 +{1}，妖丹 +{2}，引妖香 +1": "Raid remporté ! Pierres spirituelles +{1}, noyaux démoniaques +{2}, encens d’appât +1", "✦ 全隊最高傷害，額外獎勵！": "✦ Plus gros dégâts du groupe — récompense bonus !", "討伐成功，但你沒有出力，沒有獎勵": "Le boss est tombé, mais vous n’avez infligé aucun dégât — pas de récompense", "討伐已結束": "Le raid est terminé", "離開戰鬥": "Quitter le combat", "與 {1} 交換妖怪": "Échanger des monstres avec {1}", "我提供": "Votre offre", "對方提供": "Leur offre", "尚未提供": "Rien pour l’instant", "選擇要提供的妖怪（出戰中的妖寵不能交換）": "Choisissez un monstre à proposer (le compagnon actif ne peut pas être échangé)", "確認交換": "Confirmer l’échange", "已確認，等待對方…": "Confirmé — en attente de l’autre joueur…", "取消交換": "Annuler l’échange", "對方已確認": "L’autre joueur a confirmé", "交換成功！獲得 {1}": "Échange réussi ! Vous obtenez {1}", "{1} 向你提出交換": "{1} vous propose un échange", "{1} 取消了交換": "{1} a annulé l’échange", "交換失敗：妖怪已不存在": "Échange échoué : le monstre n’existe plus", "{1} 加入了房間": "{1} a rejoint le salon", "{1} 離開了房間": "{1} a quitté le salon", "請輸入房間名稱": "Veuillez saisir un nom de salon", "已加入房間 {1}": "Salon {1} rejoint", "無法載入連線元件，已改為同裝置分頁模式": "Composant réseau indisponible — mode onglets du même appareil", "房間已滿（最多 8 人）": "Le salon est plein (8 joueurs max)", "團戰勇士": "Combattant de raid", "參與妖王討伐並勝利": "Raids remportés"}, "zh-CN": {"房間": "房间", "輸入房間名稱，與朋友（最多 8 人）一起交換妖怪、討伐妖王。房間名稱相同的人會連到一起。": "输入房间名称，与朋友（最多 8 人）一起交换妖怪、讨伐妖王。房间名称相同的人会连到一起。", "你的暱稱": "你的昵称", "房間名稱": "房间名称", "加入房間": "加入房间", "離開房間": "离开房间", "連線中…": "连线中…", "房間 {1} · 成員 {2}/8": "房间 {1} · 成员 {2}/8", "連線方式：點對點（WebRTC）": "连线方式：点对点（WebRTC）", "連線方式：同裝置分頁（無法載入連線元件）": "连线方式：同装置分页（无法载入连线元件）", "等待其他人加入…（把房間名稱告訴朋友）": "等待其他人加入…（把房间名称告诉朋友）", "我": "我", "交換": "交换", "妖王討伐": "妖王讨伐", "發起妖王討伐": "发起妖王讨伐", "加入討伐": "加入讨伐", "討伐進度 {1} / {2}": "讨伐进度 {1} / {2}", "我的傷害：{1}": "我的伤害：{1}", "目前沒有討伐。任何成員都能發起，全員傷害累計，打倒妖王大家都有獎勵。": "目前没有讨伐。任何成员都能发起，全员伤害累计，打倒妖王大家都有奖励。", "{1} 發起了妖王討伐！到房間加入": "{1} 发起了妖王讨伐！到房间加入", "團戰勝利！靈石 +{1}，妖丹 +{2}，引妖香 +1": "团战胜利！灵石 +{1}，妖丹 +{2}，引妖香 +1", "✦ 全隊最高傷害，額外獎勵！": "✦ 全队最高伤害，额外奖励！", "討伐成功，但你沒有出力，沒有獎勵": "讨伐成功，但你没有出力，没有奖励", "討伐已結束": "讨伐已结束", "離開戰鬥": "离开战斗", "與 {1} 交換妖怪": "与 {1} 交换妖怪", "我提供": "我提供", "對方提供": "对方提供", "尚未提供": "尚未提供", "選擇要提供的妖怪（出戰中的妖寵不能交換）": "选择要提供的妖怪（出战中的妖宠不能交换）", "確認交換": "确认交换", "已確認，等待對方…": "已确认，等待对方…", "取消交換": "取消交换", "對方已確認": "对方已确认", "交換成功！獲得 {1}": "交换成功！获得 {1}", "{1} 向你提出交換": "{1} 向你提出交换", "{1} 取消了交換": "{1} 取消了交换", "交換失敗：妖怪已不存在": "交换失败：妖怪已不存在", "{1} 加入了房間": "{1} 加入了房间", "{1} 離開了房間": "{1} 离开了房间", "請輸入房間名稱": "请输入房间名称", "已加入房間 {1}": "已加入房间 {1}", "無法載入連線元件，已改為同裝置分頁模式": "无法载入连线元件，已改为同装置分页模式", "房間已滿（最多 8 人）": "房间已满（最多 8 人）", "團戰勇士": "团战勇士", "參與妖王討伐並勝利": "参与妖王讨伐并胜利"}};
+            for (const L of Object.keys(FUSE_I18N5)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N5[L]); }
             const I18N_LANGS = ['en', 'fr', 'zh-CN', 'zh-TW'];
             const I18N_LANG_NAMES = [['en', 'English'], ['fr', 'Français'], ['zh-CN', '简体中文'], ['zh-TW', '繁體中文']];
             const CJK_RE = /[㐀-鿿]/;
@@ -1417,7 +1441,7 @@
                 radarCollapsed: false,
                 radarTimer: null,
                 inventory: { swordCharm: 0, qiPill: 0, demonCore: 0, incense: 0 },
-                stones: 0, fused: {}, fuseCount: 0, fuseSel: [], stats: { kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0 }, medals: {}, eggs: [], streak: { date: '', count: 0 }, buddyAcc: 0, quests: [], questDate: '', companion: null, lastLevel: null, regenAcc: 0,
+                stones: 0, fused: {}, fuseCount: 0, fuseSel: [], stats: { kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0, raids: 0 }, medals: {}, eggs: [], streak: { date: '', count: 0 }, buddyAcc: 0, tower: { refined: 0, slots: [] }, towerMode: false, quests: [], questDate: '', companion: null, lastLevel: null, regenAcc: 0,
                 stops: [], stopIdSeq: 0, walked: 0, dex: {}, savedWorld: null, killCount: 0, weather: null, worldAnchor: null, envTimer: null,
                 collection: [],
                 kiln: {
@@ -2050,6 +2074,13 @@
             // 妖怪圖鑑
             // ============================================================
             function renderCollection() {
+                renderCollectionBase();
+                const el = document.getElementById('tab-collection');
+                if (!el) return;
+                el.insertAdjacentHTML('afterbegin', towerHtml());
+                el.classList.toggle('tower-mode', !!state.towerMode);
+            }
+            function renderCollectionBase() {
                 const el = document.getElementById('tab-collection');
                 const found = ENEMIES.filter(e => state.dex[e.name]).length;
                 const dexHtml = ENEMIES.map(e => {
@@ -2340,7 +2371,7 @@
                         inventory: state.inventory,
                         collection: state.collection,
                         kiln: state.kiln,
-                        lang: 'tw', stones: state.stones, walked: state.walked, dex: state.dex, fused: state.fused, fuseCount: state.fuseCount, stats: state.stats, medals: state.medals, eggs: state.eggs, streak: state.streak, upg: UPG, quests: state.quests,
+                        lang: 'tw', stones: state.stones, walked: state.walked, dex: state.dex, fused: state.fused, fuseCount: state.fuseCount, stats: state.stats, medals: state.medals, eggs: state.eggs, streak: state.streak, tower: state.tower, upg: UPG, quests: state.quests,
                         questDate: state.questDate, companion: state.companion, world: buildWorld(), killCount: state.killCount
                     }));
                 } catch (e) {}
@@ -2359,10 +2390,11 @@
                     state.dex = d.dex || {};
                     state.fused = d.fused || {};
                     state.fuseCount = d.fuseCount | 0;
-                    state.stats = Object.assign({ kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0 }, d.stats || {});
+                    state.stats = Object.assign({ kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0, raids: 0 }, d.stats || {});
                     state.medals = d.medals || {};
                     state.eggs = Array.isArray(d.eggs) ? d.eggs : [];
                     state.streak = d.streak || { date: '', count: 0 };
+                    state.tower = (d.tower && Array.isArray(d.tower.slots)) ? d.tower : { refined: 0, slots: [] };
                     state.quests = (d.lang === 'tw' && Array.isArray(d.quests)) ? d.quests : [];   // 舊存檔任務文字是簡體，重新抽
                     state.questDate = d.questDate || '';
                     state.companion = d.companion || null;
@@ -2507,6 +2539,9 @@
                 if (buy) { buyShopItem(buy.dataset.buy); return; }
                 const sett = e.target.closest('[data-setting]');
                 if (sett) { handleSetting(sett.dataset.setting); return; }
+                if (e.target.closest('[data-tower-mode]')) { state.towerMode = !state.towerMode; renderCollection(); return; }
+                const tc = e.target.closest('[data-tower-claim]');
+                if (tc) { claimTower(parseInt(tc.dataset.towerClaim, 10)); return; }
                 const fp = e.target.closest('[data-fuse-pick]');
                 if (fp) {
                     const t = parseInt(fp.dataset.fusePick, 10);
@@ -2522,6 +2557,7 @@
                     const time = parseInt(card.dataset.time, 10);
                     const c = state.collection.find(x => x.time === time);
                     if (!c) return;
+                    if (state.towerMode) { sendToTower(c); return; }
                     if (state.companion && state.companion.time === time) {
                         state.companion = null;
                         addToast('妖寵已收回');
@@ -2668,6 +2704,8 @@
                 { k: 'eggs', icon: '🥚', name: '孵化師', desc: '孵化妖卵', t: [2, 8, 25], get: () => state.stats.eggs },
                 { k: 'dex', icon: '📖', name: '妖怪學者', desc: '圖鑑收錄種類', t: [3, 6, 8], get: () => ENEMIES.filter(e => state.dex[e.name]).length },
                 { k: 'gyms', icon: '🏯', name: '道場霸主', desc: '攻佔道場', t: [1, 5, 15], get: () => state.stats.gyms },
+                { k: 'raids', icon: '🐉', name: '團戰勇士', desc: '參與妖王討伐並勝利', t: [1, 5, 15], get: () => state.stats.raids || 0 },
+                { k: 'tower', icon: '🗼', name: '煉妖塔主', desc: '煉化妖怪', t: [3, 10, 30], get: () => state.tower.refined },
                 { k: 'shiny', icon: '✦', name: '閃光獵人', desc: '收服閃光妖', t: [1, 3, 8], get: () => state.stats.shinies }
             ];
             const MEDAL_TIER = ['未獲得', '銅章', '銀章', '金章'];
@@ -2724,6 +2762,415 @@
                 }
                 updateHUD();
             }
+
+
+            // ============================================================
+            // 煉妖塔：把多餘的妖怪煉化成妖丹與靈石
+            // ============================================================
+            function towerLevel() { return Math.min(10, 1 + Math.floor(state.tower.refined / 4)); }
+            function towerSlots() { return Math.min(4, 1 + Math.floor(towerLevel() / 2)); }
+            function towerPower(c) { return 1 + (c.tier || 0) + (c.shiny ? 2 : 0) + (c.mut ? 1 : 0) + Math.floor((c.lv || 1) / 3); }
+            function sendToTower(c) {
+                if (state.companion && state.companion.time === c.time) { addToast('請先收回出戰的妖寵'); return; }
+                if (state.tower.slots.length >= towerSlots()) { addToast('煉妖塔已滿，請先領取或等待煉化完成'); return; }
+                if (!window.confirm(trText(`確定將 ${dispName(c)} 送入煉妖塔？妖怪會被煉化消失。`))) return;
+                const pw = towerPower(c);
+                state.tower.slots.push({
+                    name: dispName(c), start: Date.now(), end: Date.now() + Math.min(300, 20 + 25 * pw) * 1000,
+                    core: 1 + Math.floor(pw / 3), stone: 4 * pw
+                });
+                state.collection = state.collection.filter(x => x !== c);
+                state.fuseSel = state.fuseSel.filter(t => t !== c.time);
+                addToast(`${dispName(c)} 已送入煉妖塔`);
+                saveProgress();
+                renderCollection(); renderFuse();
+            }
+            function claimTower(i) {
+                const sl = state.tower.slots[i];
+                if (!sl || Date.now() < sl.end) return;
+                const core = sl.core, stone = sl.stone + towerLevel() * 2;
+                state.tower.slots.splice(i, 1);
+                const lvBefore = towerLevel();
+                state.tower.refined++;
+                state.inventory.demonCore += core;
+                state.stones += stone;
+                addToast(`煉化完成：妖丹 +${core}，靈石 +${stone}`);
+                if (towerLevel() > lvBefore) addToast(`煉妖塔升到 Lv.${towerLevel()}！容量 ${towerSlots()}`);
+                sfx('pickup');
+                updateInventoryBadge();
+                updateHUD();
+                renderCollection(); renderFuse(); renderInventory();
+            }
+            function towerHtml() {
+                const slots = state.tower.slots, cap = towerSlots(), now = Date.now();
+                let rows = '';
+                for (let i = 0; i < cap; i++) {
+                    const sl = slots[i];
+                    if (!sl) { rows += '<div class="tower-slot"><span>▫️</span><span style="color:#6a8aaf;">空位</span></div>'; continue; }
+                    const left = Math.max(0, Math.ceil((sl.end - now) / 1000));
+                    rows += `<div class="tower-slot"><span>🔥</span><span>${sl.name}</span>` + (left > 0
+                        ? `<span style="margin-left:auto;color:#ffd166;">煉化中 · 剩 ${left} 秒</span>`
+                        : `<button class="item-use-btn" data-tower-claim="${i}">領取煉化</button>`) + '</div>';
+                }
+                return `<div id="tower-box" class="egg-row" style="flex-direction:column;align-items:stretch;gap:0;">
+                    <div style="font-weight:700;color:#ffd166;"><span>🗼</span> <span>煉妖塔 Lv.${towerLevel()} · 容量 ${slots.length}/${cap}</span></div>
+                    <div class="kiln-hint" style="margin:4px 0;">將多餘的妖怪送入塔中煉化，換取妖丹與靈石；煉化越多，塔越高、容量越大。</div>
+                    ${rows}
+                    <button class="item-use-btn" data-tower-mode="1" style="margin-top:8px;align-self:center;">${state.towerMode ? '結束送入模式' : '送入煉妖塔'}</button>
+                    ${state.towerMode ? '<div class="kiln-hint" style="text-align:center;color:#ff8fe8;margin-top:6px;">點選下方妖怪，即可送入煉妖塔</div>' : ''}
+                </div>`;
+            }
+            setInterval(() => {
+                const box = document.getElementById('tower-box');
+                if (!box || !state.tower.slots.length) return;
+                const panel = document.getElementById('tab-collection');
+                if (!panel || panel.classList.contains('hidden') || inventoryModal.classList.contains('hidden')) return;
+                box.outerHTML = towerHtml();
+            }, 1000);
+
+
+            // ============================================================
+            // 聯機房間：房間名稱 + WebRTC 點對點（Trystero）。交換妖怪、共同討伐妖王。
+            // 載入失敗時退回「同裝置分頁」模式（BroadcastChannel），方便單機測試。
+            // ============================================================
+            const NET_APP_ID = 'yujian-sword-quest-v1';
+            const NET_MAX_PEERS = 7;
+            const RAID_TTL = 10 * 60 * 1000;
+            const Net = { room: '', mode: '', selfId: '', peers: {}, ignored: {}, send: null, leave: null, joining: false };
+            let netTrade = null, netRaid = null, _nickMem = '';
+            function esc(x) { return String(x).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+            function cleanNick(n) { return String(n == null ? '' : n).replace(/[\u0000-\u001f<>&"']/g, '').trim().slice(0, 12); }
+            function getNick() {
+                if (_nickMem) return _nickMem;
+                let n = '';
+                try { n = cleanNick(localStorage.getItem('yujian_nick')); } catch (e) {}
+                if (!n) { n = '道友' + Math.floor(1000 + Math.random() * 9000); }
+                _nickMem = n;
+                try { localStorage.setItem('yujian_nick', n); } catch (e) {}
+                return n;
+            }
+            function setNick(n) {
+                n = cleanNick(n);
+                if (!n) return;
+                _nickMem = n;
+                try { localStorage.setItem('yujian_nick', n); } catch (e) {}
+            }
+            function pname(id) { return (Net.peers[id] && Net.peers[id].name) || '?'; }
+            function sp(name) { return `<span data-i18n-skip>${esc(name)}</span>`; }
+            function peerCount() { return Object.keys(Net.peers).length; }
+
+            async function netJoin(roomName) {
+                roomName = String(roomName || '').trim().slice(0, 32);
+                if (!roomName) { addToast('請輸入房間名稱'); return; }
+                if (Net.room || Net.joining) netLeave(true);
+                Net.joining = true; renderRoom();
+                let ok = false;
+                try {
+                    const mod = await Promise.race([
+                        import('https://cdn.jsdelivr.net/npm/trystero@0.26.0/+esm'),
+                        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 9000))
+                    ]);
+                    const room = mod.joinRoom({ appId: NET_APP_ID }, 'yj-' + roomName);
+                    Net.selfId = mod.selfId;
+                    const act = room.makeAction('g');
+                    if (Array.isArray(act)) { Net.send = (d, to) => act[0](d, to || undefined); act[1]((d, id) => netRecv(d, id)); }
+                    else { Net.send = (d, to) => act.send(d, to ? { target: to } : undefined); act.onMessage = (d, meta) => netRecv(d, meta && meta.peerId ? meta.peerId : meta); }
+                    room.onPeerJoin = id => netPeerJoin(id);
+                    room.onPeerLeave = id => netPeerLeave(id);
+                    Net.leave = () => { try { room.leave(); } catch (e) {} };
+                    Net.mode = 'p2p';
+                    ok = true;
+                } catch (e) { console.warn('trystero load failed:', e && e.message); }
+                if (!ok) {
+                    if (typeof BroadcastChannel === 'undefined') { Net.joining = false; renderRoom(); addToast('無法載入連線元件，已改為同裝置分頁模式'); return; }
+                    const bc = new BroadcastChannel('yj-' + roomName);
+                    Net.selfId = 'L' + Math.random().toString(36).slice(2, 8);
+                    bc.onmessage = ev => {
+                        const m = ev.data;
+                        if (!m || m.from === Net.selfId || (m.to && m.to !== Net.selfId)) return;
+                        if (m.sys === 'join') { netPeerJoin(m.from); bc.postMessage({ sys: 'here', from: Net.selfId, to: m.from }); return; }
+                        if (m.sys === 'here') { netPeerJoin(m.from); return; }
+                        if (m.sys === 'bye') { netPeerLeave(m.from); return; }
+                        netRecv(m.d, m.from);
+                    };
+                    Net.send = (d, to) => bc.postMessage({ from: Net.selfId, to: to || null, d });
+                    Net.leave = () => { try { bc.postMessage({ sys: 'bye', from: Net.selfId }); bc.close(); } catch (e) {} };
+                    bc.postMessage({ sys: 'join', from: Net.selfId });
+                    Net.mode = 'local';
+                    addToast('無法載入連線元件，已改為同裝置分頁模式');
+                }
+                Net.room = roomName; Net.joining = false; Net.peers = {}; Net.ignored = {};
+                netTrade = null;
+                addToast(`已加入房間 ${roomName}`);
+                renderRoom();
+            }
+            function netLeave(silent) {
+                if (Net.leave) Net.leave();
+                Net.room = ''; Net.mode = ''; Net.peers = {}; Net.ignored = {}; Net.send = null; Net.leave = null; Net.joining = false;
+                netTrade = null;
+                if (netRaid && !(battle.active && battle.mode === 'raid')) netRaid = null;
+                if (!silent) renderRoom();
+                updateRoomAlert();
+            }
+            function netPeerJoin(id) {
+                if (!id || Net.peers[id] || Net.ignored[id]) return;
+                if (peerCount() >= NET_MAX_PEERS) { Net.ignored[id] = 1; addToast('房間已滿（最多 8 人）'); return; }
+                Net.peers[id] = { name: '…', hello: false };
+                if (Net.send) Net.send({ t: 'hello', name: getNick() }, id);
+                renderRoom();
+            }
+            function netPeerLeave(id) {
+                const p = Net.peers[id];
+                delete Net.peers[id]; delete Net.ignored[id];
+                if (p && p.hello) addToast(`${p.name} 離開了房間`);
+                if (netTrade && netTrade.peer === id) netTrade = null;
+                renderRoom();
+            }
+            function netRecv(d, id) {
+                if (!d || typeof d !== 'object' || !id || Net.ignored[id]) return;
+                if (!Net.peers[id]) { if (d.t === 'hello') netPeerJoin(id); if (!Net.peers[id]) return; }
+                switch (d.t) {
+                    case 'hello': {
+                        const first = !Net.peers[id].hello;
+                        Net.peers[id].name = cleanNick(d.name) || '?';
+                        Net.peers[id].hello = true;
+                        if (first) addToast(`${Net.peers[id].name} 加入了房間`);
+                        renderRoom();
+                        break;
+                    }
+                    case 'trade-offer': onTradeOffer(id, d); break;
+                    case 'trade-ok': onTradeOk(id, d); break;
+                    case 'trade-cancel':
+                        if (netTrade && netTrade.peer === id) { addToast(`${pname(id)} 取消了交換`); netTrade = null; renderRoom(); }
+                        break;
+                    case 'raid-start': onRaidStart(id, d); break;
+                    case 'raid-dmg': onRaidDmg(id, d); break;
+                }
+            }
+
+            // ---------- 交換 ----------
+            function snapMon(c) { return { id: c.time, emoji: c.emoji, name: c.name, lv: c.lv || 1, tier: c.tier || 0, hue: c.hue || 0, mut: c.mut ? 1 : 0, shiny: c.shiny ? 1 : 0, fkey: c.fkey || null }; }
+            function cleanMon(m) {
+                if (!m || typeof m !== 'object') return null;
+                const en = ENEMIES.find(e => e.emoji === m.emoji);
+                if (!en) return null;
+                const names = [en.name].concat(FUSE_RECIPES.map(r => r[2]));
+                if (names.indexOf(m.name) < 0) return null;
+                const out = { id: (+m.id) | 0, emoji: en.emoji, name: m.name, lv: Math.min(10, Math.max(1, m.lv | 0)), tier: Math.min(CONFIG.fuseMaxTier, Math.max(0, m.tier | 0)), hue: (((+m.hue || 0) % 360) + 360) % 360, exp: 0 };
+                if (m.mut) out.mut = 1;
+                if (m.shiny) out.shiny = 1;
+                if (typeof m.fkey === 'string' && /^\d-\d$/.test(m.fkey)) out.fkey = m.fkey;
+                return out;
+            }
+            function openTrade(peer) {
+                if (!Net.peers[peer]) return;
+                netTrade = { peer, mine: null, theirs: null, myOk: false, theirOk: false };
+                renderRoom();
+            }
+            function offerMine(time) {
+                if (!netTrade) return;
+                const c = state.collection.find(x => x.time === time);
+                if (!c || (state.companion && state.companion.time === c.time)) return;
+                netTrade.mine = time; netTrade.myOk = false; netTrade.theirOk = false;
+                Net.send({ t: 'trade-offer', mon: snapMon(c) }, netTrade.peer);
+                renderRoom();
+            }
+            function onTradeOffer(id, d) {
+                const mon = cleanMon(d.mon);
+                if (!mon) return;
+                if (!netTrade || netTrade.peer !== id) {
+                    if (netTrade && netTrade.mine != null) return;
+                    netTrade = { peer: id, mine: null, theirs: null, myOk: false, theirOk: false };
+                    addToast(`${pname(id)} 向你提出交換`);
+                    setRoomAlert(true);
+                }
+                netTrade.theirs = mon; netTrade.myOk = false; netTrade.theirOk = false;
+                renderRoom();
+            }
+            function confirmTrade() {
+                if (!netTrade || netTrade.mine == null || !netTrade.theirs) return;
+                netTrade.myOk = true;
+                Net.send({ t: 'trade-ok', sig: netTrade.mine + ':' + netTrade.theirs.id }, netTrade.peer);
+                tryExecuteTrade();
+                renderRoom();
+            }
+            function onTradeOk(id, d) {
+                if (!netTrade || netTrade.peer !== id || netTrade.mine == null || !netTrade.theirs) return;
+                if (d.sig !== netTrade.theirs.id + ':' + netTrade.mine) return;
+                netTrade.theirOk = true;
+                tryExecuteTrade();
+                renderRoom();
+            }
+            function tryExecuteTrade() {
+                const t = netTrade;
+                if (!t || !t.myOk || !t.theirOk) return;
+                const c = state.collection.find(x => x.time === t.mine);
+                if (!c || (state.companion && state.companion.time === c.time)) { addToast('交換失敗：妖怪已不存在'); Net.send({ t: 'trade-cancel' }, t.peer); netTrade = null; return; }
+                state.collection = state.collection.filter(x => x !== c);
+                const got = Object.assign({}, t.theirs, { time: nextTime() });
+                delete got.id;
+                state.collection.push(got);
+                state.dex[got.name] = state.dex[got.name] || 1;
+                if (got.fkey) state.fused[got.fkey] = 1;
+                state.fuseSel = state.fuseSel.filter(x => x !== c.time);
+                netTrade = null;
+                sfx('pickup');
+                addToast(`交換成功！獲得 ${dispName(got)}`);
+                saveProgress();
+                renderCollection(); renderFuse();
+            }
+            function cancelTrade() {
+                if (!netTrade) return;
+                if (Net.send) Net.send({ t: 'trade-cancel' }, netTrade.peer);
+                netTrade = null; renderRoom();
+            }
+
+            // ---------- 妖王討伐（團戰）----------
+            function raidAlive() { return !!(netRaid && !netRaid.done && Date.now() - netRaid.t0 < RAID_TTL); }
+            function raidRemaining() {
+                if (!netRaid) return 0;
+                let sum = 0;
+                for (const k in netRaid.dmg) sum += netRaid.dmg[k];
+                return Math.max(0, netRaid.max - sum);
+            }
+            function startRaid() {
+                if (!Net.room || raidAlive()) return;
+                const id = Math.random().toString(36).slice(2, 8);
+                const idx = Math.floor(Math.random() * ENEMIES.length);
+                const max = 120 * (peerCount() + 1) + 80;
+                netRaid = { id, idx, max, dmg: {}, by: Net.selfId, t0: Date.now(), done: false };
+                Net.send({ t: 'raid-start', id, idx, max });
+                renderRoom();
+            }
+            function onRaidStart(from, d) {
+                if (raidAlive()) return;
+                const idx = d.idx | 0, max = d.max | 0;
+                if (idx < 0 || idx >= ENEMIES.length || max < 100 || max > 1500 || typeof d.id !== 'string') return;
+                netRaid = { id: d.id.slice(0, 12), idx, max, dmg: {}, by: from, t0: Date.now(), done: false };
+                addToast(`${pname(from)} 發起了妖王討伐！到房間加入`);
+                setRoomAlert(true);
+                renderRoom();
+            }
+            function joinRaid() {
+                if (!raidAlive() || raidRemaining() <= 0 || battle.active || !state.running) return;
+                document.getElementById('room-modal').classList.add('hidden');
+                enterBattle(null, 'raid');
+            }
+            function raidAddDmg(dmg) {
+                netRaid.dmg[Net.selfId] = (netRaid.dmg[Net.selfId] || 0) + dmg;
+                if (Net.send) Net.send({ t: 'raid-dmg', id: netRaid.id, total: netRaid.dmg[Net.selfId] });
+            }
+            function onRaidDmg(from, d) {
+                if (!netRaid || netRaid.done || d.id !== netRaid.id) return;
+                const total = Math.min(Math.max(0, d.total | 0), netRaid.max);
+                netRaid.dmg[from] = Math.max(netRaid.dmg[from] || 0, total);
+                const rem = raidRemaining();
+                if (battle.active && battle.mode === 'raid') {
+                    battle.enemyHp = rem; updateBattleHUD();
+                    if (rem <= 0 && !battle.resolveLock) winBattle();
+                } else if (rem <= 0) completeRaid();
+                renderRoom();
+            }
+            function completeRaid() {
+                if (!netRaid || netRaid.done) return;
+                netRaid.done = true;
+                const mine = netRaid.dmg[Net.selfId] || 0;
+                let total = 0, top = 0;
+                for (const k in netRaid.dmg) { total += netRaid.dmg[k]; top = Math.max(top, netRaid.dmg[k]); }
+                setRoomAlert(false);
+                if (mine <= 0) { addToast('討伐成功，但你沒有出力，沒有獎勵'); renderRoom(); return; }
+                const mvp = mine >= top;
+                const stones = 20 + Math.round(100 * mine / Math.max(1, total)) + (mvp ? 20 : 0);
+                const cores = 2 + (mvp ? 1 : 0);
+                state.stones += stones; state.inventory.demonCore += cores; state.inventory.incense += 1;
+                state.stats.raids = (state.stats.raids || 0) + 1;
+                state.score += 3;
+                addEgg(2, true);
+                addToast(`團戰勝利！靈石 +${stones}，妖丹 +${cores}，引妖香 +1`);
+                if (mvp) addToast('✦ 全隊最高傷害，額外獎勵！');
+                sfx('win');
+                updateInventoryBadge(); updateHUD(); renderRoom();
+            }
+            function setRoomAlert(on) { const b = document.getElementById('btn-room'); if (b) b.classList.toggle('alert', !!on); }
+            function updateRoomAlert() { if (!Net.room) setRoomAlert(false); }
+
+            // ---------- 房間畫面 ----------
+            function renderRoom() {
+                const el = document.getElementById('room-body');
+                if (!el) return;
+                const ph = k => esc(trText(k));
+                if (Net.joining) { el.innerHTML = '<div class="kiln-hint" style="text-align:center;">連線中…</div>'; return; }
+                if (!Net.room) {
+                    el.innerHTML = `
+                        <div class="kiln-hint" style="margin-bottom:10px;">輸入房間名稱，與朋友（最多 8 人）一起交換妖怪、討伐妖王。房間名稱相同的人會連到一起。</div>
+                        <input id="room-nick" class="room-input" maxlength="12" value="${esc(getNick())}" placeholder="${ph('你的暱稱')}" data-i18n-skip>
+                        <input id="room-name" class="room-input" maxlength="32" placeholder="${ph('房間名稱')}" data-i18n-skip>
+                        <div style="text-align:center;margin-top:10px;"><button class="btn-modal-action" data-room="join">加入房間</button></div>`;
+                    return;
+                }
+                const n = peerCount() + 1;
+                let html = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><div data-i18n-skip style="font-weight:700;color:#ffd166;flex:1;min-width:0;">${esc(trText('房間 ◆ · 成員 ' + n + '/8')).replace('◆', esc(Net.room))}</div><button class="item-use-btn" data-room="leave">離開房間</button></div>`;
+                html += `<div class="kiln-hint" style="margin-bottom:8px;">${Net.mode === 'p2p' ? '連線方式：點對點（WebRTC）' : '連線方式：同裝置分頁（無法載入連線元件）'}</div>`;
+                html += `<div class="room-peer">🧑 <span>我</span> ${sp(getNick())}</div>`;
+                for (const id of Object.keys(Net.peers)) {
+                    const p = Net.peers[id];
+                    html += `<div class="room-peer">🧑 ${sp(p.name)}` + (p.hello ? `<button class="item-use-btn" data-room="trade" data-id="${esc(id)}">交換</button>` : '') + '</div>';
+                }
+                if (!peerCount()) html += '<div class="kiln-hint" style="text-align:center;margin:8px 0;">等待其他人加入…（把房間名稱告訴朋友）</div>';
+                // 團戰
+                html += '<div class="kiln-hint" style="text-align:center;margin:14px 0 6px;color:#ffd166;font-weight:700;">妖王討伐</div>';
+                if (raidAlive()) {
+                    const rem = raidRemaining(), pct = Math.round(rem / netRaid.max * 100);
+                    html += `<div class="egg-row" style="flex-direction:column;align-items:stretch;gap:4px;"><div style="font-weight:700;color:#e8f2ff;">${sprFor(ENEMIES[netRaid.idx].emoji, { px: 36 })} ${ENEMIES[netRaid.idx].name}</div>
+                        <div class="egg-info">討伐進度 ${rem} / ${netRaid.max}</div><div class="egg-bar"><i style="width:${pct}%"></i></div>
+                        <div class="egg-info">我的傷害：${netRaid.dmg[Net.selfId] || 0}</div>` +
+                        Object.keys(netRaid.dmg).filter(k => k !== Net.selfId).map(k => `<div class="egg-info">${sp(pname(k))}：${netRaid.dmg[k]}</div>`).join('') +
+                        `<div style="text-align:center;margin-top:6px;"><button class="btn-modal-action" data-room="raid-join" ${rem > 0 && state.running ? '' : 'disabled'}>加入討伐</button></div></div>`;
+                } else {
+                    html += `<div class="kiln-hint" style="text-align:center;">目前沒有討伐。任何成員都能發起，全員傷害累計，打倒妖王大家都有獎勵。</div><div style="text-align:center;margin-top:8px;"><button class="btn-modal-action" data-room="raid-start">發起妖王討伐</button></div>`;
+                }
+                // 交換
+                if (netTrade && Net.peers[netTrade.peer]) {
+                    const t = netTrade;
+                    const mine = t.mine != null ? state.collection.find(c => c.time === t.mine) : null;
+                    html += `<div class="kiln-hint" style="text-align:center;margin:16px 0 6px;color:#ffd166;font-weight:700;">與 ${sp(pname(t.peer))} 交換妖怪</div>`;
+                    html += `<div class="kiln-hint" style="text-align:center;">我提供 ⇄ 對方提供</div><div class="fuse-slots"><div class="fuse-slot">${mine ? fxSpr(mine, { px: 56 }) : '<span style="color:#6a8aaf;">?</span>'}</div><span class="fuse-op">⇄</span><div class="fuse-slot">${t.theirs ? fxSpr(t.theirs, { px: 56 }) : '<span style="color:#6a8aaf;">?</span>'}</div></div>`;
+                    html += `<div class="kiln-hint" style="text-align:center;">${mine ? dispName(mine) : '尚未提供'} ⇄ ${t.theirs ? dispName(t.theirs) : '尚未提供'}</div>`;
+                    const ok = mine && t.theirs;
+                    html += `<div style="text-align:center;margin:8px 0;"><button class="btn-modal-action" data-room="confirm" ${ok && !t.myOk ? '' : 'disabled'}>${t.myOk ? '已確認，等待對方…' : '確認交換'}</button> <button class="item-use-btn" data-room="cancel">取消交換</button></div>`;
+                    if (t.theirOk) html += '<div class="kiln-hint" style="text-align:center;color:#7be3b5;">對方已確認</div>';
+                    html += '<div class="kiln-hint" style="text-align:center;margin:8px 0;">選擇要提供的妖怪（出戰中的妖寵不能交換）</div><div class="collection-grid">' +
+                        state.collection.filter(c => !(state.companion && state.companion.time === c.time)).map(c => `<div class="collection-card fuse-card${t.mine === c.time ? ' equipped' : ''}" data-room="offer" data-id="${c.time}"><div class="collection-emoji">${fxSpr(c, { px: 44 })}</div><div class="collection-name">${dispName(c)}${c.tier ? ' ★' + c.tier : ''} Lv.${c.lv || 1}</div></div>`).join('') + '</div>';
+                }
+                el.innerHTML = html;
+            }
+            document.getElementById('btn-room').addEventListener('click', () => {
+                if (battle.active) return;
+                setRoomAlert(false);
+                renderRoom();
+                document.getElementById('room-modal').classList.remove('hidden');
+            });
+            document.getElementById('room-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'room-modal') { e.target.classList.add('hidden'); return; }
+                const b = e.target.closest('[data-room]');
+                if (!b || b.disabled) return;
+                const act = b.dataset.room, id = b.dataset.id;
+                if (act === 'join') {
+                    const nick = document.getElementById('room-nick'), rn = document.getElementById('room-name');
+                    if (nick) setNick(nick.value);
+                    netJoin(rn ? rn.value : '');
+                }
+                else if (act === 'leave') netLeave();
+                else if (act === 'trade') openTrade(id);
+                else if (act === 'offer') offerMine(parseInt(id, 10));
+                else if (act === 'confirm') confirmTrade();
+                else if (act === 'cancel') cancelTrade();
+                else if (act === 'raid-start') startRaid();
+                else if (act === 'raid-join') joinRaid();
+            });
+            document.getElementById('btn-raid-leave').addEventListener('click', () => {
+                if (battle.active && battle.mode === 'raid') { closeBattleOverlay(); resumeTargetTimeouts(); renderRoom(); }
+            });
 
             // ---------- 擊敗記錄 / 收服 ----------
             function recordDefeat(name, emoji, chance, shiny) {
@@ -3012,6 +3459,9 @@
                 if (mode === 'gym') {
                     if (!gymObj) return;
                     targetData = gymObj;
+                } else if (mode === 'raid') {
+                    if (!raidAlive() || raidRemaining() <= 0) return;
+                    targetData = netRaid;
                 } else {
                     targetData = state.targets.find(t => t.id === targetId);
                     if (!targetData) return;
@@ -3032,14 +3482,14 @@
                 battle.aimPointerId = null;
 
                 // 敵人屬性（地圖上看到的妖怪就是對戰的妖怪）
-                const template = (mode === 'normal' && targetData.enemyIdx != null)
+                const template = mode === 'raid' ? ENEMIES[targetData.idx] : (mode === 'normal' && targetData.enemyIdx != null)
                     ? ENEMIES[targetData.enemyIdx]
                     : ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
                 battle.enemyName = (mode === 'gym' ? gymObj.enemyName : template.name);
                 battle.enemyEmoji = (mode === 'gym' ? gymObj.enemyEmoji : template.emoji);
                 const baseHp = CONFIG.enemyMinHp + Math.floor(Math.random() * (CONFIG.enemyMaxHp - CONFIG.enemyMinHp + 1));
                 battle.elite = mode === 'normal' && !!targetData.elite;
-                battle.boss = mode === 'normal' && !!targetData.boss;
+                battle.boss = (mode === 'normal' && !!targetData.boss) || mode === 'raid';
                 battle.enemyMaxHp = mode === 'gym' ? Math.floor(baseHp * CONFIG.gymHpMul)
                                   : (battle.boss ? Math.floor(baseHp * 3) : (battle.elite ? Math.floor(baseHp * 1.7) : baseHp));
                 battle.baseName = battle.enemyName;
@@ -3047,7 +3497,9 @@
                 if (battle.shiny) battle.enemyName = '閃光 · ' + battle.enemyName;
                 if (battle.boss) battle.enemyName = '妖王·' + battle.enemyName;
                 else if (battle.elite) battle.enemyName = '精英·' + battle.enemyName;
-                battle.enemyHp = battle.enemyMaxHp;
+                if (mode === 'raid') battle.enemyMaxHp = targetData.max;
+                battle.enemyHp = mode === 'raid' ? raidRemaining() : battle.enemyMaxHp;
+                document.getElementById('btn-raid-leave').style.display = mode === 'raid' ? 'block' : 'none';
                 battle.attackInterval = mode === 'gym'
                     ? Math.floor(CONFIG.enemyAttackInterval * CONFIG.gymAttackMul)
                     : CONFIG.enemyAttackInterval;
@@ -3409,6 +3861,7 @@
                 const q = ratio < 0.35 ? 1.5 : (ratio < 0.65 ? 1.25 : 1);
                 const dmg = Math.round(baseDmg * battle.damageBonus * lvMul * q);
                 battle.enemyHp = Math.max(0, battle.enemyHp - dmg);
+                if (battle.mode === 'raid' && netRaid) { raidAddDmg(dmg); battle.enemyHp = raidRemaining(); }
                 battle.hurtFlash = 1;
                 sfx('hit');
                 updateBattleHUD();
@@ -3465,6 +3918,14 @@
                 const wasShiny = !!battle.shiny;
 
                 closeBattleOverlay();
+
+                if (mode === 'raid') {
+                    completeRaid();
+                    updateHUD();
+                    resumeTargetTimeouts();
+                    statusEl.textContent = '團戰勝利！';
+                    return;
+                }
 
                 if (mode === 'gym' && gym) {
                     // 攻佔道場
@@ -3542,6 +4003,7 @@
                 battle.aimPointerId = null;
                 battle.damageBonus = 1;
                 battle.charging = false;
+                document.getElementById('btn-raid-leave').style.display = 'none';
                 if (battle.attackTimer) { clearTimeout(battle.attackTimer); battle.attackTimer = null; }
                 stopBattleLoop();
                 battleOverlay.classList.add('hidden');
@@ -3583,7 +4045,7 @@
                 state.kiln = { active: false, startTime: 0, pendingEmoji: null, pendingName: null };
                 if (kilnTimer) { clearInterval(kilnTimer); kilnTimer = null; }
                 state.stones = 0; state.companion = null; state.quests = []; state.questDate = '';
-                state.walked = 0; state.dex = {}; state.fused = {}; state.fuseCount = 0; state.fuseSel = []; state.stats = { kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0 }; state.medals = {}; state.eggs = []; state.streak = { date: '', count: 0 }; state.buddyAcc = 0; state.savedWorld = null; state.killCount = 0;
+                state.walked = 0; state.dex = {}; state.fused = {}; state.fuseCount = 0; state.fuseSel = []; state.stats = { kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0, raids: 0 }; state.medals = {}; state.eggs = []; state.streak = { date: '', count: 0 }; state.buddyAcc = 0; state.tower = { refined: 0, slots: [] }; state.towerMode = false; state.savedWorld = null; state.killCount = 0;
                 state.lastLevel = null; state.regenAcc = 0;
                 Object.assign(UPG, { hp: 0, dmg: 0, regen: 0 });
                 const restored = loadProgress();   // 讀取上次存檔，進度不再丟失
