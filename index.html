@@ -255,6 +255,13 @@
         .target-marker.elite .target-distance { top: 54px; }
         .collection-card { cursor: pointer; }
         .fuse-card { cursor: pointer; }
+        .target-marker.shiny .spr { filter: hue-rotate(70deg) saturate(1.5) drop-shadow(0 0 5px #ffe08a); }
+        .egg-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 8px; border-radius: 12px; background: rgba(255,209,102,0.06); border: 1px solid rgba(255,209,102,0.18); }
+        .egg-ico { font-size: 26px; }
+        .egg-info { flex: 1; min-width: 0; font-size: 12px; color: #a8c8e8; }
+        .egg-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); margin-top: 5px; overflow: hidden; }
+        .egg-bar > i { display: block; height: 100%; background: linear-gradient(90deg, #ffd166, #ff9f43); }
+        .medal-tier { font-size: 11px; color: #ffd166; margin-left: 6px; }
         .fuse-slots { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 6px 0 10px; }
         .fuse-slot { width: 74px; height: 74px; border: 1px dashed rgba(255,209,102,0.45); border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(255,209,102,0.05); }
         .fuse-op { color: #ffd166; font-size: 20px; font-weight: 800; }
@@ -1074,6 +1081,8 @@
             for (const L of Object.keys(FUSE_I18N)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N[L]); }
             const FUSE_I18N2 = {"en": {"突變": "Mutant", "✦ 突變！{1} 變得更強了": "✦ Mutation! {1} grew stronger", "合成 {1} 次 · 靈泉互動範圍 {2} 公尺": "Fusions: {1} · Spring reach: {2} m", "突變機率 {1}%": "Mutation chance {1}%", "合成次數越多，靈泉的可互動範圍越大。": "The more you fuse, the farther you can reach springs.", "靈泉互動範圍提升至 {1} 公尺": "Spring reach increased to {1} m", "距離靈泉 {1}m，靠近到 {2}m 內再來": "Spring is {1} m away — get within {2} m"}, "fr": {"突變": "Mutant", "✦ 突變！{1} 變得更強了": "✦ Mutation ! {1} est devenu plus fort", "合成 {1} 次 · 靈泉互動範圍 {2} 公尺": "Fusions : {1} · Portée des sources : {2} m", "突變機率 {1}%": "Chance de mutation {1} %", "合成次數越多，靈泉的可互動範圍越大。": "Plus vous fusionnez, plus la portée des sources augmente.", "靈泉互動範圍提升至 {1} 公尺": "Portée des sources portée à {1} m", "距離靈泉 {1}m，靠近到 {2}m 內再來": "Source à {1} m — approchez-vous à moins de {2} m"}, "zh-CN": {"突變": "突变", "✦ 突變！{1} 變得更強了": "✦ 突变！{1} 变得更强了", "合成 {1} 次 · 靈泉互動範圍 {2} 公尺": "合成 {1} 次 · 灵泉互动范围 {2} 米", "突變機率 {1}%": "突变概率 {1}%", "合成次數越多，靈泉的可互動範圍越大。": "合成次数越多，灵泉的可互动范围越大。", "靈泉互動範圍提升至 {1} 公尺": "灵泉互动范围提升至 {1} 米", "距離靈泉 {1}m，靠近到 {2}m 內再來": "距离灵泉 {1}m，靠近到 {2}m 内再来"}};
             for (const L of Object.keys(FUSE_I18N2)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N2[L]); }
+            const FUSE_I18N3 = {"en": {"妖卵": "Egg", "妖卵×{1}": "Egg ×{1}", "妖卵 {1}/{2} · 步行或斬妖可累積孵化進度": "Eggs {1}/{2} · Walk or slay monsters to hatch them", "{1} 公尺妖卵": "{1} m Egg", "{1} / {2} 公尺": "{1} / {2} m", "沒有妖卵。靈泉補給、擊敗妖王或每日登入大獎都有機會獲得。": "No eggs. Get them from springs, bosses or the 7-day login prize.", "妖卵孵化了！獲得 {1}": "An egg hatched! Got {1}", "獲得一顆妖卵（{1} 公尺）": "Got an egg ({1} m)", "妖卵欄已滿，沒有獲得妖卵": "Egg slots full — no egg received", "勳章": "Medals", "斬妖人": "Slayer", "累計斬殺妖邪": "Total monsters slain", "行者": "Wanderer", "累計步行（公里）": "Total distance walked (km)", "泉水巡禮": "Spring Pilgrim", "使用靈泉補給": "Springs used", "合成師": "Fusion Adept", "合成妖怪次數": "Monsters fused", "孵化師": "Egg Hatcher", "孵化妖卵": "Eggs hatched", "妖怪學者": "Monster Scholar", "圖鑑收錄種類": "Species in the dex", "道場霸主": "Dojo Master", "攻佔道場": "Dojos conquered", "閃光獵人": "Shiny Hunter", "收服閃光妖": "Shiny monsters caught", "未獲得": "Locked", "銅章": "Bronze", "銀章": "Silver", "金章": "Gold", "勳章進度 {1} / {2}": "Progress {1} / {2}", "已達最高等級": "Max tier reached", "勳章：{1} {2}，靈石 +{3}": "Medal: {1} {2}, Spirit Stones +{3}", "連續登入 {1} 天（第 7 天有大獎）": "Login streak: {1} days (big prize on day 7)", "每日登入第 {1} 天：靈石 +{2}": "Daily login day {1}: Spirit Stones +{2}", "七日大獎：妖丹×2、引妖香×1": "7-day prize: Demon Core ×2, Lure Incense ×1", "絕佳一擊！造成 {1} 點傷害": "Excellent hit! {1} damage", "精準一擊！造成 {1} 點傷害": "Great hit! {1} damage", "閃光": "Shiny", "✦ 發現閃光妖！": "✦ A shiny monster appeared!"}, "fr": {"妖卵": "Œuf", "妖卵×{1}": "Œuf ×{1}", "妖卵 {1}/{2} · 步行或斬妖可累積孵化進度": "Œufs {1}/{2} · Marchez ou terrassez des monstres pour les faire éclore", "{1} 公尺妖卵": "Œuf {1} m", "{1} / {2} 公尺": "{1} / {2} m", "沒有妖卵。靈泉補給、擊敗妖王或每日登入大獎都有機會獲得。": "Aucun œuf. Obtenez-en aux sources, sur les boss ou avec la récompense des 7 jours.", "妖卵孵化了！獲得 {1}": "Un œuf a éclos ! Vous obtenez {1}", "獲得一顆妖卵（{1} 公尺）": "Vous obtenez un œuf ({1} m)", "妖卵欄已滿，沒有獲得妖卵": "Emplacements d’œufs pleins — aucun œuf reçu", "勳章": "Médailles", "斬妖人": "Pourfendeur", "累計斬殺妖邪": "Monstres terrassés au total", "行者": "Marcheur", "累計步行（公里）": "Distance totale marchée (km)", "泉水巡禮": "Pèlerin des sources", "使用靈泉補給": "Sources utilisées", "合成師": "Adepte de fusion", "合成妖怪次數": "Fusions réalisées", "孵化師": "Éleveur d’œufs", "孵化妖卵": "Œufs éclos", "妖怪學者": "Érudit des monstres", "圖鑑收錄種類": "Espèces au bestiaire", "道場霸主": "Maître de dojo", "攻佔道場": "Dojos conquis", "閃光獵人": "Chasseur de chromatiques", "收服閃光妖": "Monstres chromatiques capturés", "未獲得": "Verrouillé", "銅章": "Bronze", "銀章": "Argent", "金章": "Or", "勳章進度 {1} / {2}": "Progression {1} / {2}", "已達最高等級": "Rang maximum atteint", "勳章：{1} {2}，靈石 +{3}": "Médaille : {1} {2}, pierres spirituelles +{3}", "連續登入 {1} 天（第 7 天有大獎）": "Série de connexion : {1} jours (gros lot au 7e jour)", "每日登入第 {1} 天：靈石 +{2}": "Connexion quotidienne, jour {1} : pierres spirituelles +{2}", "七日大獎：妖丹×2、引妖香×1": "Lot des 7 jours : Noyau démoniaque ×2, Encens d’appât ×1", "絕佳一擊！造成 {1} 點傷害": "Coup excellent ! {1} dégâts", "精準一擊！造成 {1} 點傷害": "Beau coup ! {1} dégâts", "閃光": "Chromatique", "✦ 發現閃光妖！": "✦ Un monstre chromatique est apparu !"}, "zh-CN": {"妖卵": "妖卵", "妖卵×{1}": "妖卵×{1}", "妖卵 {1}/{2} · 步行或斬妖可累積孵化進度": "妖卵 {1}/{2} · 步行或斩妖可累积孵化进度", "{1} 公尺妖卵": "{1} 米妖卵", "{1} / {2} 公尺": "{1} / {2} 米", "沒有妖卵。靈泉補給、擊敗妖王或每日登入大獎都有機會獲得。": "没有妖卵。灵泉补给、击败妖王或每日登入大奖都有机会获得。", "妖卵孵化了！獲得 {1}": "妖卵孵化了！获得 {1}", "獲得一顆妖卵（{1} 公尺）": "获得一颗妖卵（{1} 米）", "妖卵欄已滿，沒有獲得妖卵": "妖卵栏已满，没有获得妖卵", "勳章": "勋章", "斬妖人": "斩妖人", "累計斬殺妖邪": "累计斩杀妖邪", "行者": "行者", "累計步行（公里）": "累计步行（公里）", "泉水巡禮": "泉水巡礼", "使用靈泉補給": "使用灵泉补给", "合成師": "合成师", "合成妖怪次數": "合成妖怪次数", "孵化師": "孵化师", "孵化妖卵": "孵化妖卵", "妖怪學者": "妖怪学者", "圖鑑收錄種類": "图鉴收录种类", "道場霸主": "道场霸主", "攻佔道場": "攻占道场", "閃光獵人": "闪光猎人", "收服閃光妖": "收服闪光妖", "未獲得": "未获得", "銅章": "铜章", "銀章": "银章", "金章": "金章", "勳章進度 {1} / {2}": "勋章进度 {1} / {2}", "已達最高等級": "已达最高等级", "勳章：{1} {2}，靈石 +{3}": "勋章：{1} {2}，灵石 +{3}", "連續登入 {1} 天（第 7 天有大獎）": "连续登入 {1} 天（第 7 天有大奖）", "每日登入第 {1} 天：靈石 +{2}": "每日登入第 {1} 天：灵石 +{2}", "七日大獎：妖丹×2、引妖香×1": "七日大奖：妖丹×2、引妖香×1", "絕佳一擊！造成 {1} 點傷害": "绝佳一击！造成 {1} 点伤害", "精準一擊！造成 {1} 點傷害": "精准一击！造成 {1} 点伤害", "閃光": "闪光", "✦ 發現閃光妖！": "✦ 发现闪光妖！"}};
+            for (const L of Object.keys(FUSE_I18N3)) { I18N[L] = Object.assign(I18N[L] || {}, FUSE_I18N3[L]); }
             const I18N_LANGS = ['en', 'fr', 'zh-CN', 'zh-TW'];
             const I18N_LANG_NAMES = [['en', 'English'], ['fr', 'Français'], ['zh-CN', '简体中文'], ['zh-TW', '繁體中文']];
             const CJK_RE = /[㐀-鿿]/;
@@ -1266,6 +1275,8 @@
                 kilnCost: 3,
                 fuseCost: 2,            // 合成需要妖丹數
                 fuseMaxTier: 3,
+                shinyChance: 1 / 32,    // 閃光妖出現機率
+                eggSlots: 3,
                 mutateChance: 0.2,      // 合成突變機率
                 stopReach: 80,          // 靈泉基礎互動範圍（公尺）
                 reachPerFuse: 10,       // 每次合成增加的互動範圍
@@ -1321,12 +1332,12 @@
                 '青龙坛': '青龍壇', '白虎坛': '白虎壇', '朱雀坛': '朱雀壇', '玄武坛': '玄武壇', '天剑道场': '天劍道場', '云隐道场': '雲隱道場' };
             function fixName(n) { return LEGACY_NAMES[n] || n; }
             function enemyByEmoji(e) { return ENEMIES.find(x => x.emoji === e) || null; }
-            function dispName(c) { return (c.mut ? '突變 · ' : '') + c.name; }
+            function dispName(c) { return (c.shiny ? '閃光 · ' : '') + (c.mut ? '突變 · ' : '') + c.name; }
             function reachM() { return CONFIG.stopReach + Math.min(CONFIG.reachMaxBonus, (state.fuseCount || 0) * CONFIG.reachPerFuse); }
             function fxSpr(c, opts) {
                 const h = sprFor(c.emoji, opts);
-                if (!c.tier && !c.hue && !c.mut) return h;
-                return `<span style="display:inline-block;line-height:0;filter:hue-rotate(${c.hue || 0}deg) saturate(1.2) drop-shadow(0 0 ${2 + (c.tier || 0) * 2 + (c.mut ? 3 : 0)}px ${c.mut ? 'rgba(255,90,220,0.95)' : 'rgba(255,209,102,0.9)'})">${h}</span>`;
+                if (!c.tier && !c.hue && !c.mut && !c.shiny) return h;
+                return `<span style="display:inline-block;line-height:0;filter:hue-rotate(${c.hue || 0}deg) saturate(1.2) drop-shadow(0 0 ${2 + (c.tier || 0) * 2 + (c.mut ? 3 : 0) + (c.shiny ? 3 : 0)}px ${c.mut ? 'rgba(255,90,220,0.95)' : 'rgba(255,209,102,0.9)'})">${h}</span>`;
             }
             function sprFor(emoji, opts) {
                 const e = enemyByEmoji(emoji);
@@ -1406,7 +1417,7 @@
                 radarCollapsed: false,
                 radarTimer: null,
                 inventory: { swordCharm: 0, qiPill: 0, demonCore: 0, incense: 0 },
-                stones: 0, fused: {}, fuseCount: 0, fuseSel: [], quests: [], questDate: '', companion: null, lastLevel: null, regenAcc: 0,
+                stones: 0, fused: {}, fuseCount: 0, fuseSel: [], stats: { kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0 }, medals: {}, eggs: [], streak: { date: '', count: 0 }, buddyAcc: 0, quests: [], questDate: '', companion: null, lastLevel: null, regenAcc: 0,
                 stops: [], stopIdSeq: 0, walked: 0, dex: {}, savedWorld: null, killCount: 0, weather: null, worldAnchor: null, envTimer: null,
                 collection: [],
                 kiln: {
@@ -1607,6 +1618,9 @@
                                     if (dd >= 3 && dd < 150) {
                                         const before = Math.floor(state.walked / 500);
                                         state.walked += dd;
+                                        addEggProgress(dd);
+                                        state.buddyAcc = (state.buddyAcc || 0) + dd;
+                                        while (state.buddyAcc >= 300) { state.buddyAcc -= 300; companionGainExp(); }
                                         if (Math.floor(state.walked / 500) > before) {
                                             state.stones += 5;
                                             addToast('步行達 ' + (Math.floor(state.walked / 500) * 0.5).toFixed(1) + ' km，靈石 +5');
@@ -1715,10 +1729,11 @@
                 const isBoss = !!(opts && opts.boss);
                 const isElite = isBoss || Math.random() < eliteChance();
                 const enemyIdx = Math.floor(Math.random() * ENEMIES.length);
+                const isShiny = !isBoss && Math.random() < CONFIG.shinyChance;
                 const sprPx = isBoss ? 84 : (isElite ? 66 : 52);
-                const badge = isBoss ? '<div class="target-badge">王</div>' : (isElite ? '<div class="target-badge">精</div>' : '');
+                const badge = isBoss ? '<div class="target-badge">王</div>' : (isShiny ? '<div class="target-badge">✦</div>' : (isElite ? '<div class="target-badge">精</div>' : ''));
                 const icon = L.divIcon({
-                    className: 'target-marker' + (isElite ? ' elite' : '') + (isBoss ? ' boss' : ''),
+                    className: 'target-marker' + (isElite ? ' elite' : '') + (isBoss ? ' boss' : '') + (isShiny ? ' shiny' : ''),
                     html: `<div class="target-ring"></div><div class="target-core has-spr">${spr(ENEMIES[enemyIdx].name, { px: sprPx })}</div>${badge}<div class="target-distance">--m</div>`,
                     iconSize: [48, 48], iconAnchor: [24, 24]
                 });
@@ -1738,7 +1753,8 @@
                     }
                 });
 
-                const targetObj = { id, latlng, marker, timeoutId: null, elite: isElite, boss: isBoss, enemyIdx };
+                const targetObj = { id, latlng, marker, timeoutId: null, elite: isElite, boss: isBoss, shiny: isShiny, enemyIdx };
+                if (isShiny) addToast('✦ 發現閃光妖！');
                 targetObj.timeoutId = setTimeout(() => {
                     if (!state.targets.find(t => t.id === id)) return;
                     if (battle.active) { targetObj.timeoutId = null; return; }
@@ -1948,7 +1964,8 @@
             // ============================================================
             // 練妖壺
             // ============================================================
-            function renderKiln() {
+            function renderKiln() { renderKilnBase(); const el = document.getElementById('tab-kiln'); if (el) el.insertAdjacentHTML('beforeend', eggsHtml()); }
+            function renderKilnBase() {
                 const el = document.getElementById('tab-kiln');
                 if (state.kiln.active) {
                     const elapsed = Date.now() - state.kiln.startTime;
@@ -2140,6 +2157,7 @@
                 state.collection = state.collection.filter(c => c !== a && c !== b);
                 const entry = { emoji: r.emoji, name: r.name, time: Date.now(), lv: r.lv, exp: 0, tier: r.tier, hue: r.hue };
                 if (mut) entry.mut = 1;
+                if (a.shiny || b.shiny) entry.shiny = 1;
                 if (r.key) { entry.fkey = r.key; state.fused[r.key] = 1; }
                 state.collection.push(entry);
                 state.fuseSel = [];
@@ -2322,7 +2340,7 @@
                         inventory: state.inventory,
                         collection: state.collection,
                         kiln: state.kiln,
-                        lang: 'tw', stones: state.stones, walked: state.walked, dex: state.dex, fused: state.fused, fuseCount: state.fuseCount, upg: UPG, quests: state.quests,
+                        lang: 'tw', stones: state.stones, walked: state.walked, dex: state.dex, fused: state.fused, fuseCount: state.fuseCount, stats: state.stats, medals: state.medals, eggs: state.eggs, streak: state.streak, upg: UPG, quests: state.quests,
                         questDate: state.questDate, companion: state.companion, world: buildWorld(), killCount: state.killCount
                     }));
                 } catch (e) {}
@@ -2341,6 +2359,10 @@
                     state.dex = d.dex || {};
                     state.fused = d.fused || {};
                     state.fuseCount = d.fuseCount | 0;
+                    state.stats = Object.assign({ kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0 }, d.stats || {});
+                    state.medals = d.medals || {};
+                    state.eggs = Array.isArray(d.eggs) ? d.eggs : [];
+                    state.streak = d.streak || { date: '', count: 0 };
                     state.quests = (d.lang === 'tw' && Array.isArray(d.quests)) ? d.quests : [];   // 舊存檔任務文字是簡體，重新抽
                     state.questDate = d.questDate || '';
                     state.companion = d.companion || null;
@@ -2390,6 +2412,11 @@
                 if (changed) saveProgress();
             }
             function renderQuests() {
+                renderQuestsBase();
+                const el = document.getElementById('tab-quests');
+                if (el) el.insertAdjacentHTML('beforeend', medalsHtml());
+            }
+            function renderQuestsBase() {
                 ensureQuests();
                 const el = document.getElementById('tab-quests');
                 el.innerHTML = '<div class="kiln-hint" style="text-align:center;margin-bottom:12px;">每日任務 · 次日自動重新整理</div>' +
@@ -2572,6 +2599,8 @@
                         got.push(ITEM_DEFS[pick].name + '×1');
                     }
                 }
+                state.stats.stops++;
+                if (Math.random() < 0.3 && addEgg(pickEggType(), true)) got.push('妖卵×1');
                 st.cooldownUntil = Date.now() + 120000;
                 st.marker.setIcon(makeStopIcon(true));
                 setTimeout(() => {
@@ -2584,14 +2613,128 @@
                 addToast('靈泉補給：' + got.join('、'));
             }
 
+
+            // ============================================================
+            // 妖卵（步行孵化）/ 勳章 / 每日登入
+            // ============================================================
+            let _tm = 0;
+            function nextTime() { _tm = Math.max(Date.now(), _tm + 1); return _tm; }
+            const EGG_TYPES = [{ m: 500, w: 60, lv: 1, shiny: 0.03 }, { m: 1000, w: 30, lv: 2, shiny: 0.08 }, { m: 2000, w: 10, lv: 3, shiny: 0.2 }];
+            function pickEggType() {
+                let r = Math.random() * 100;
+                for (let i = 0; i < EGG_TYPES.length; i++) { if (r < EGG_TYPES[i].w) return i; r -= EGG_TYPES[i].w; }
+                return 0;
+            }
+            function addEgg(type, silent) {
+                if (state.eggs.length >= CONFIG.eggSlots) { if (!silent) addToast('妖卵欄已滿，沒有獲得妖卵'); return false; }
+                state.eggs.push({ t: type, prog: 0 });
+                if (!silent) addToast(`獲得一顆妖卵（${EGG_TYPES[type].m} 公尺）`);
+                return true;
+            }
+            function addEggProgress(m) {
+                if (!state.eggs.length) return;
+                for (const e of state.eggs) e.prog += m;
+                const done = state.eggs.filter(e => e.prog >= EGG_TYPES[e.t].m);
+                if (!done.length) return;
+                state.eggs = state.eggs.filter(e => e.prog < EGG_TYPES[e.t].m);
+                for (const e of done) {
+                    const ty = EGG_TYPES[e.t];
+                    const en = ENEMIES[Math.floor(Math.random() * ENEMIES.length)];
+                    const c = { emoji: en.emoji, name: en.name, time: nextTime(), lv: ty.lv };
+                    const sh = Math.random() < ty.shiny;
+                    if (sh) { c.shiny = 1; c.hue = 70; state.stats.shinies++; }
+                    state.collection.push(c);
+                    state.stats.eggs++;
+                    state.dex[en.name] = state.dex[en.name] || 1;
+                    addToast(`妖卵孵化了！獲得 ${sh ? '閃光 · ' : ''}${en.name}`);
+                }
+                sfx('pickup');
+                saveProgress();
+            }
+            function eggsHtml() {
+                const head = `<div class="kiln-hint" style="text-align:center;margin:16px 0 8px;color:#ffd166;font-weight:700;">妖卵 ${state.eggs.length}/${CONFIG.eggSlots} · 步行或斬妖可累積孵化進度</div>`;
+                if (!state.eggs.length) return head + '<div class="kiln-hint" style="text-align:center;">沒有妖卵。靈泉補給、擊敗妖王或每日登入大獎都有機會獲得。</div>';
+                return head + state.eggs.map(e => {
+                    const ty = EGG_TYPES[e.t];
+                    const pct = Math.min(100, Math.round(e.prog / ty.m * 100));
+                    return `<div class="egg-row"><div class="egg-ico">🥚</div><div class="egg-info"><div>${ty.m} 公尺妖卵</div><div>${Math.min(ty.m, Math.floor(e.prog))} / ${ty.m} 公尺</div><div class="egg-bar"><i style="width:${pct}%"></i></div></div></div>`;
+                }).join('');
+            }
+            const MEDALS = [
+                { k: 'kills', icon: '⚔️', name: '斬妖人', desc: '累計斬殺妖邪', t: [10, 50, 200], get: () => state.stats.kills },
+                { k: 'walk', icon: '👣', name: '行者', desc: '累計步行（公里）', t: [1, 5, 20], get: () => state.walked / 1000, dec: true },
+                { k: 'stops', icon: '⛲', name: '泉水巡禮', desc: '使用靈泉補給', t: [5, 25, 100], get: () => state.stats.stops },
+                { k: 'fuse', icon: '⚗️', name: '合成師', desc: '合成妖怪次數', t: [3, 10, 30], get: () => state.fuseCount },
+                { k: 'eggs', icon: '🥚', name: '孵化師', desc: '孵化妖卵', t: [2, 8, 25], get: () => state.stats.eggs },
+                { k: 'dex', icon: '📖', name: '妖怪學者', desc: '圖鑑收錄種類', t: [3, 6, 8], get: () => ENEMIES.filter(e => state.dex[e.name]).length },
+                { k: 'gyms', icon: '🏯', name: '道場霸主', desc: '攻佔道場', t: [1, 5, 15], get: () => state.stats.gyms },
+                { k: 'shiny', icon: '✦', name: '閃光獵人', desc: '收服閃光妖', t: [1, 3, 8], get: () => state.stats.shinies }
+            ];
+            const MEDAL_TIER = ['未獲得', '銅章', '銀章', '金章'];
+            const MEDAL_REWARD = [10, 25, 60];
+            let _medalBusy = false;
+            function checkMedals() {
+                if (_medalBusy || !state.medals) return;
+                _medalBusy = true;
+                try {
+                    for (const m of MEDALS) {
+                        const v = m.get();
+                        let tier = 0;
+                        for (let i = 0; i < m.t.length; i++) if (v >= m.t[i]) tier = i + 1;
+                        let have = state.medals[m.k] || 0;
+                        while (have < tier) {
+                            state.stones += MEDAL_REWARD[have];
+                            addToast(`勳章：${m.name} ${MEDAL_TIER[have + 1]}，靈石 +${MEDAL_REWARD[have]}`);
+                            have++;
+                            state.medals[m.k] = have;
+                        }
+                    }
+                } finally { _medalBusy = false; }
+            }
+            function medalsHtml() {
+                checkMedals();
+                const cards = MEDALS.map(m => {
+                    const v = m.get();
+                    const tier = state.medals[m.k] || 0;
+                    const next = m.t[tier];
+                    const cur = m.dec ? v.toFixed(1) : Math.floor(v);
+                    const prog = next === undefined ? '已達最高等級' : `勳章進度 ${cur} / ${next}`;
+                    return `<div class="item-card"><div class="item-icon">${m.icon}</div><div class="item-info"><div class="item-name">${m.name}<span class="medal-tier">${MEDAL_TIER[tier]}</span></div><div class="item-desc">${m.desc}</div><div class="item-desc">${prog}</div></div></div>`;
+                }).join('');
+                return `<div class="kiln-hint" style="text-align:center;margin:16px 0 4px;color:#7be3b5;font-weight:700;">連續登入 ${state.streak.count || 0} 天（第 7 天有大獎）</div>` +
+                    `<div class="kiln-hint" style="text-align:center;margin:12px 0 8px;color:#ffd166;font-weight:700;">勳章</div>` + cards;
+            }
+            function dailyLogin() {
+                if (!state.running) return;
+                const today = new Date().toDateString();
+                if (state.streak.date === today) return;
+                const yesterday = new Date(Date.now() - 864e5).toDateString();
+                const count = state.streak.date === yesterday ? (state.streak.count || 0) + 1 : 1;
+                state.streak = { date: today, count };
+                const day = ((count - 1) % 7) + 1;
+                const gain = 5 * day;
+                state.stones += gain;
+                addToast(`每日登入第 ${count} 天：靈石 +${gain}`);
+                if (day === 7) {
+                    state.inventory.demonCore += 2; state.inventory.incense += 1;
+                    addEgg(2, true);
+                    updateInventoryBadge();
+                    addToast('七日大獎：妖丹×2、引妖香×1');
+                    addToast('獲得一顆妖卵（2000 公尺）');
+                }
+                updateHUD();
+            }
+
             // ---------- 擊敗記錄 / 收服 ----------
-            function recordDefeat(name, emoji, chance) {
+            function recordDefeat(name, emoji, chance, shiny) {
                 if (!name) return;
                 companionGainExp();
                 state.dex[name] = (state.dex[name] || 0) + 1;
                 if (Math.random() < chance) {
-                    state.collection.push({ emoji, name, time: Date.now() });
-                    addToast(`收服 ${name}！`);
+                    const c = { emoji, name, time: nextTime() };
+                    if (shiny) { c.shiny = 1; c.hue = 70; state.stats.shinies++; }
+                    state.collection.push(c);
+                    addToast(`收服 ${shiny ? '閃光 · ' : ''}${name}！`);
                 }
             }
 
@@ -2698,7 +2841,7 @@
             function companionMul() {
                 const c = getCompanionEntry();
                 if (!c) return 1;
-                return 1 + 0.10 + 0.02 * (c.lv || 1) + 0.06 * (c.tier || 0) + (c.mut ? 0.10 : 0);
+                return 1 + 0.10 + 0.02 * (c.lv || 1) + 0.06 * (c.tier || 0) + (c.mut ? 0.10 : 0) + (c.shiny ? 0.08 : 0);
             }
             function companionGainExp() {
                 const c = getCompanionEntry();
@@ -2844,6 +2987,7 @@
             }
 
             function updateHUD() {
+                checkMedals();
                 saveProgress();
                 scoreEl.textContent = state.score;
                 hpEl.textContent = state.hp;
@@ -2899,6 +3043,8 @@
                 battle.enemyMaxHp = mode === 'gym' ? Math.floor(baseHp * CONFIG.gymHpMul)
                                   : (battle.boss ? Math.floor(baseHp * 3) : (battle.elite ? Math.floor(baseHp * 1.7) : baseHp));
                 battle.baseName = battle.enemyName;
+                battle.shiny = mode === 'normal' && !!targetData.shiny;
+                if (battle.shiny) battle.enemyName = '閃光 · ' + battle.enemyName;
                 if (battle.boss) battle.enemyName = '妖王·' + battle.enemyName;
                 else if (battle.elite) battle.enemyName = '精英·' + battle.enemyName;
                 battle.enemyHp = battle.enemyMaxHp;
@@ -3027,7 +3173,7 @@
                         const r = battle.enemySize * 1.05;
                         if (dx * dx + dy * dy < r * r) {
                             s.hit = true;
-                            onSwordHit();
+                            onSwordHit(Math.sqrt(dx * dx + dy * dy) / r);
                             battle.swords.splice(i, 1);
                             continue;
                         }
@@ -3255,17 +3401,18 @@
             // ============================================================
             // 命中 / 勝負
             // ============================================================
-            function onSwordHit() {
+            function onSwordHit(ratio) {
                 if (battle.dying || battle.resolveLock) return;
                 const baseDmg = 9 + Math.floor(Math.random() * 7);
                 const level = Math.floor(state.score / CONFIG.expPerLevel) + 1;
                 const lvMul = (1 + (level - 1) * CONFIG.levelDmgBonus) * (1 + UPG.dmg * 0.08) * companionMul();
-                const dmg = Math.round(baseDmg * battle.damageBonus * lvMul);
+                const q = ratio < 0.35 ? 1.5 : (ratio < 0.65 ? 1.25 : 1);
+                const dmg = Math.round(baseDmg * battle.damageBonus * lvMul * q);
                 battle.enemyHp = Math.max(0, battle.enemyHp - dmg);
                 battle.hurtFlash = 1;
                 sfx('hit');
                 updateBattleHUD();
-                addBattleLog(`飛劍命中！造成 ${dmg} 點傷害`);
+                addBattleLog(q === 1.5 ? `絕佳一擊！造成 ${dmg} 點傷害` : (q === 1.25 ? `精準一擊！造成 ${dmg} 點傷害` : `飛劍命中！造成 ${dmg} 點傷害`));
                 if (battle.charging) {
                     battle.charging = false;
                     battleHintEl.textContent = DEFAULT_HINT;
@@ -3315,6 +3462,7 @@
                 const wasElite = !!battle.elite;
                 const wasBoss = !!battle.boss;
                 const baseName = battle.baseName, baseEmoji = battle.enemyEmoji;
+                const wasShiny = !!battle.shiny;
 
                 closeBattleOverlay();
 
@@ -3332,6 +3480,7 @@
                     state.score += 2;
                     state.stones += 10;
                     addQuestProgress('gym');
+                    state.stats.gyms++; state.stats.kills++; addEggProgress(50);
                     recordDefeat(baseName, baseEmoji, 1);
                     addQuestProgress('kill');
                     updateHUD();
@@ -3347,8 +3496,9 @@
                     addQuestProgress('kill');
                     if (wasElite) { addQuestProgress('elite'); state.inventory.demonCore++; updateInventoryBadge(); }
                     if (wasBoss) { state.inventory.demonCore += 2; state.inventory.incense++; updateInventoryBadge(); addToast('妖王掉落：妖丹×2 引妖香×1'); }
-                    recordDefeat(baseName, baseEmoji, wasBoss ? 1 : (wasElite ? 0.5 : 0.2));
-                    state.killCount++;
+                    recordDefeat(baseName, baseEmoji, (wasBoss || wasShiny) ? 1 : (wasElite ? 0.5 : 0.2), wasShiny);
+                    state.killCount++; state.stats.kills++; addEggProgress(50);
+                    if (wasBoss) addEgg(2);
                     if (state.killCount % 10 === 0) {
                         addToast('⚠ 妖王現身！');
                         setTimeout(() => { if (state.running && !battle.active) spawnTarget({ boss: true }); }, 1500);
@@ -3433,11 +3583,12 @@
                 state.kiln = { active: false, startTime: 0, pendingEmoji: null, pendingName: null };
                 if (kilnTimer) { clearInterval(kilnTimer); kilnTimer = null; }
                 state.stones = 0; state.companion = null; state.quests = []; state.questDate = '';
-                state.walked = 0; state.dex = {}; state.fused = {}; state.fuseCount = 0; state.fuseSel = []; state.savedWorld = null; state.killCount = 0;
+                state.walked = 0; state.dex = {}; state.fused = {}; state.fuseCount = 0; state.fuseSel = []; state.stats = { kills: 0, stops: 0, eggs: 0, gyms: 0, shinies: 0 }; state.medals = {}; state.eggs = []; state.streak = { date: '', count: 0 }; state.buddyAcc = 0; state.savedWorld = null; state.killCount = 0;
                 state.lastLevel = null; state.regenAcc = 0;
                 Object.assign(UPG, { hp: 0, dmg: 0, regen: 0 });
                 const restored = loadProgress();   // 讀取上次存檔，進度不再丟失
                 ensureQuests();
+                setTimeout(dailyLogin, 1200);
                 updateAvatar();
                 ensureKilnTimer();
                 updateInventoryBadge();
